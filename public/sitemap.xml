@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+>
+
+  <!-- Главная -->
+  <url>
+    <loc>https://digestnews.uz/ru</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/uz</loc>
+  </url>
+
+  <!-- Категории -->
+  <url>
+    <loc>https://digestnews.uz/ru/category/uzbekistan</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/ru/category/world</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/ru/category/auto</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/ru/category/incidents</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/ru/category/science</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/ru/category/economy</loc>
+  </url>
+
+  <url>
+    <loc>https://digestnews.uz/uz/category/uzbekistan</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/uz/category/world</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/uz/category/auto</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/uz/category/incidents</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/uz/category/science</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/uz/category/economy</loc>
+  </url>
+
+  <!-- Статические страницы -->
+  <url>
+    <loc>https://digestnews.uz/ru/about</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/ru/contacts</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/ru/privacy</loc>
+  </url>
+
+  <url>
+    <loc>https://digestnews.uz/uz/about</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/uz/contacts</loc>
+  </url>
+  <url>
+    <loc>https://digestnews.uz/uz/privacy</loc>
+  </url>
+
+</urlset>
