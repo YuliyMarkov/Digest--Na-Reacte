@@ -8,6 +8,7 @@ function Seo({
   type = "website",
   schema = null,
   locale = "ru_RU",
+  preloadImage = "",
 }) {
   const siteUrl = "https://digestnews.uz";
   const siteName = "Дайджест";
@@ -25,6 +26,11 @@ function Seo({
   const safeImage =
     typeof image === "string" && image.trim() ? image.trim() : "/preview.jpg";
 
+  const safePreloadImage =
+    typeof preloadImage === "string" && preloadImage.trim()
+      ? preloadImage.trim()
+      : "";
+
   const fullTitle = safeTitle.includes("Дайджест")
     ? safeTitle
     : `${safeTitle} — Дайджест`;
@@ -34,6 +40,12 @@ function Seo({
   const fullImage = safeImage.startsWith("http")
     ? safeImage
     : `${siteUrl}${safeImage}`;
+
+  const fullPreloadImage = safePreloadImage
+    ? safePreloadImage.startsWith("http")
+      ? safePreloadImage
+      : `${siteUrl}${safePreloadImage}`
+    : "";
 
   const normalizedSchema = schema
     ? JSON.parse(
@@ -50,7 +62,6 @@ function Seo({
       <meta name="description" content={safeDescription} />
       <meta name="robots" content="index,follow" />
 
-      {/* Open Graph */}
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={safeDescription} />
       <meta property="og:type" content={type} />
@@ -62,17 +73,23 @@ function Seo({
       <meta property="og:site_name" content={siteName} />
       <meta property="og:locale" content={locale} />
 
-      {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={safeDescription} />
       <meta name="twitter:image" content={fullImage} />
       <meta name="twitter:image:alt" content={fullTitle} />
 
-      {/* Canonical */}
       <link rel="canonical" href={fullUrl} />
 
-      {/* Schema.org */}
+      {fullPreloadImage && (
+        <link
+          rel="preload"
+          as="image"
+          href={fullPreloadImage}
+          fetchpriority="high"
+        />
+      )}
+
       {normalizedSchema && (
         <script type="application/ld+json">
           {JSON.stringify(normalizedSchema)}

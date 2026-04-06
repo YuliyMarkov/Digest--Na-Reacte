@@ -115,6 +115,8 @@ function HomePage({ onOpenReel }) {
     );
   }
 
+  const firstImage = featuredArticles[0]?.coverImage || "";
+
   return (
     <main className="main container">
       <Seo
@@ -123,6 +125,7 @@ function HomePage({ onOpenReel }) {
         canonical={canonical}
         locale={locale}
         image="/preview.jpg"
+        preloadImage={firstImage}
       />
 
       <TopNews
