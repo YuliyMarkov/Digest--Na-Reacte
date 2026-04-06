@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  admin
+  editor
+}
+
+enum ArticleStatus {
+  draft
+  published
+  archived
+}
+
+enum Locale {
+  ru
+  uz
+}
+
+enum MediaType {
+  instagram
+  youtube
+  video
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         UserRole  @default(editor)
+  articles     Article[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Category {
+  id                Int               @id @default(autoincrement())
+  slug              String            @unique
+  nameRu            String
+  nameUz            String
+  sortOrder         Int               @default(0)
+  isVisible         Boolean           @default(true)
+  articles          Article[]
+  articleCategories ArticleCategory[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+}
+
+model Article {
+  id                Int                  @id @default(autoincrement())
+  slug              String               @unique
+  categoryId        Int
+  authorId          Int
+  status            ArticleStatus        @default(draft)
+  coverImage        String?
+  publishedAt       DateTime?
+  isFeatured        Boolean              @default(false)
+  category          Category             @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  author            User                 @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  translations      ArticleTranslation[]
+  reactions         ArticleReaction?
+  articleCategories ArticleCategory[]
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+}
+
+model ArticleTranslation {
+  id             Int       @id @default(autoincrement())
+  articleId      Int
+  locale         Locale
+  title          String
+  excerpt        String?
+  content        String
+  seoTitle       String?
+  seoDescription String?
+  article        Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([articleId, locale])
+}
+
+model ArticleReaction {
+  id         Int      @id @default(autoincrement())
+  articleId  Int      @unique
+  fireCount  Int      @default(0)
+  heartCount Int      @default(0)
+  laughCount Int      @default(0)
+  wowCount   Int      @default(0)
+  angryCount Int      @default(0)
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ArticleCategory {
+  articleId  Int
+  categoryId Int
+
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@id([articleId, categoryId])
+}
+
+model MediaItem {
+  id           Int       @id @default(autoincrement())
+  titleRu      String?
+  titleUz      String?
+  type         MediaType
+  previewImage String?
+  videoUrl     String
+  sortOrder    Int       @default(0)
+  isVisible    Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Setting {
+  id                Int      @id @default(autoincrement())
+  siteNameRu        String?
+  siteNameUz        String?
+  siteDescriptionRu String?
+  siteDescriptionUz String?
+  contactEmail      String?
+  telegramUrl       String?
+  instagramUrl      String?
+  youtubeUrl        String?
+  logo              String?
+  updatedAt         DateTime @updatedAt
+}
