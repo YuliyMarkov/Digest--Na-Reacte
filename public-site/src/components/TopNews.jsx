@@ -1,109 +1,91 @@
-import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useLanguage } from '../context/useLanguage'
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { useLanguage } from "../context/useLanguage";
 
-function TopNews({ articles = [] }) {
-  const { language } = useLanguage()
-
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
-
-  const touchStartX = useRef(0)
-  const touchEndX = useRef(0)
+function TopNews({
+  featuredArticles = [],
+  latestArticles = [],
+  error = "",
+}) {
+  const { language } = useLanguage();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const trackRef = useRef(null);
+  const startXRef = useRef(null);
+  const deltaXRef = useRef(0);
 
   const uiText = {
     ru: {
-      main: 'Главное',
-      latest: 'Последние новости',
-      prev: 'Предыдущая новость',
-      next: 'Следующая новость',
-      slide: 'Перейти к слайду',
-      empty: 'Пока нет новостей',
+      main: "Главное",
+      latest: "Последние новости",
+      empty: "Пока нет новостей",
+      error: "Не удалось загрузить новости",
     },
     uz: {
-      main: 'Asosiy',
-      latest: 'So‘nggi yangiliklar',
-      prev: 'Oldingi yangilik',
-      next: 'Keyingi yangilik',
-      slide: 'Slaydga o‘tish',
-      empty: 'Hozircha yangiliklar yo‘q',
+      main: "Asosiy",
+      latest: "So‘nggi yangiliklar",
+      empty: "Hozircha yangiliklar yo‘q",
+      error: "Yangiliklarni yuklab bo‘lmadi",
     },
-  }
+  };
 
-  const t = uiText[language] || uiText.ru
+  const t = uiText[language] || uiText.ru;
 
-  const slides = articles.slice(0, 5)
-  const latestArticles = articles.slice(0, 8)
+  const sliderArticles = useMemo(
+    () => featuredArticles.slice(0, 5),
+    [featuredArticles]
+  );
 
-  const safeCurrentSlide =
-    slides.length === 0 ? 0 : Math.min(currentSlide, slides.length - 1)
+  const sidebarArticles = useMemo(
+    () => latestArticles.slice(0, 8),
+    [latestArticles]
+  );
 
   useEffect(() => {
-    const firstSlideImage = slides[0]?.coverImage
-    if (!firstSlideImage) return
+    if (sliderArticles.length <= 1) return;
 
-    const existingPreload = document.querySelector(
-      `link[rel="preload"][href="${firstSlideImage}"]`
-    )
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) =>
+        prev === sliderArticles.length - 1 ? 0 : prev + 1
+      );
+    }, 5000);
 
-    if (existingPreload) return
-
-    const preloadLink = document.createElement('link')
-    preloadLink.rel = 'preload'
-    preloadLink.as = 'image'
-    preloadLink.href = firstSlideImage
-
-    document.head.appendChild(preloadLink)
-
-    return () => {
-      if (document.head.contains(preloadLink)) {
-        document.head.removeChild(preloadLink)
-      }
-    }
-  }, [slides])
+    return () => clearInterval(interval);
+  }, [sliderArticles]);
 
   const goToPrev = () => {
-    if (slides.length === 0) return
-    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1))
-  }
+    setCurrentIndex((prev) =>
+      prev === 0 ? sliderArticles.length - 1 : prev - 1
+    );
+  };
 
   const goToNext = () => {
-    if (slides.length === 0) return
-    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1))
-  }
+    setCurrentIndex((prev) =>
+      prev === sliderArticles.length - 1 ? 0 : prev + 1
+    );
+  };
 
-  const goToSlide = (index) => {
-    setCurrentSlide(index)
-  }
+  const handleTouchStart = (event) => {
+    startXRef.current = event.touches[0].clientX;
+    deltaXRef.current = 0;
+  };
 
-  useEffect(() => {
-    if (isPaused || slides.length <= 1) return
+  const handleTouchMove = (event) => {
+    if (startXRef.current === null) return;
+    deltaXRef.current = event.touches[0].clientX - startXRef.current;
+  };
 
-    const intervalId = setInterval(() => {
-      setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1))
-    }, 3000)
+  const handleTouchEnd = () => {
+    if (startXRef.current === null) return;
 
-    return () => clearInterval(intervalId)
-  }, [isPaused, slides.length])
-
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.changedTouches[0].clientX
-  }
-
-  const handleTouchEnd = (e) => {
-    touchEndX.current = e.changedTouches[0].clientX
-
-    const diff = touchStartX.current - touchEndX.current
-    const swipeThreshold = 50
-
-    if (Math.abs(diff) < swipeThreshold) return
-
-    if (diff > 0) {
-      goToNext()
-    } else {
-      goToPrev()
+    if (deltaXRef.current > 50) {
+      goToPrev();
+    } else if (deltaXRef.current < -50) {
+      goToNext();
     }
-  }
+
+    startXRef.current = null;
+    deltaXRef.current = 0;
+  };
 
   return (
     <section className="top-news">
@@ -113,85 +95,87 @@ function TopNews({ articles = [] }) {
             <h2>{t.main}</h2>
           </div>
 
-          {slides.length === 0 ? (
-            <div className="top-news-empty">
+          {error ? (
+            <div className="news-feed-empty">
+              <p>{t.error}</p>
+            </div>
+          ) : sliderArticles.length === 0 ? (
+            <div className="news-feed-empty">
               <p>{t.empty}</p>
             </div>
           ) : (
             <>
-              <div
-                className="top-news-slider"
-                onMouseEnter={() => setIsPaused(true)}
-                onMouseLeave={() => setIsPaused(false)}
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-              >
+              <div className="top-news-slider">
                 <button
-                  className="slider-btn prev"
                   type="button"
-                  aria-label={t.prev}
+                  className="slider-btn prev"
                   onClick={goToPrev}
+                  aria-label="Previous slide"
                 >
-                  &#10094;
+                  ‹
                 </button>
 
-                <div className="top-news-viewport">
+                <div
+                  className="top-news-viewport"
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >
                   <div
                     className="top-news-track"
-                    style={{ transform: `translateX(-${safeCurrentSlide * 100}%)` }}
+                    ref={trackRef}
+                    style={{ transform: `translateX(-${currentIndex * 100}%)` }}
                   >
-                    {slides.map((slide, index) => {
-                      const title = slide.translation?.title || slide.slug
-                      const alt = title
+                    {sliderArticles.map((article) => {
+                      const title = article.translation?.title || article.slug;
+                      const seoTitle =
+                        article.translation?.seoTitle?.trim() || title;
 
                       return (
-                        <article className="top-slide" key={slide.id}>
+                        <article className="top-slide" key={article.id}>
                           <Link
-                            to={`/${language}/news/${slide.slug}`}
+                            to={`/${language}/news/${article.slug}`}
                             className="top-slide-link"
+                            title={seoTitle}
                           >
-                            {slide.coverImage && (
-                              <img
-                                src={slide.coverImage}
-                                alt={alt}
-                                loading={index === 0 ? 'eager' : 'lazy'}
-                                fetchpriority={index === 0 ? 'high' : 'auto'}
-                                decoding="async"
-                                width="1200"
-                                height="675"
-                              />
+                            {article.coverImage && (
+                              <img src={article.coverImage} alt={seoTitle} />
                             )}
                             <div className="top-slide-overlay">
                               <h3>{title}</h3>
                             </div>
                           </Link>
                         </article>
-                      )
+                      );
                     })}
                   </div>
                 </div>
 
                 <button
-                  className="slider-btn next"
                   type="button"
-                  aria-label={t.next}
+                  className="slider-btn next"
                   onClick={goToNext}
+                  aria-label="Next slide"
                 >
-                  &#10095;
+                  ›
                 </button>
               </div>
 
-              <div className="top-news-dots">
-                {slides.map((slide, index) => (
-                  <button
-                    key={slide.id}
-                    className={`top-news-dot ${safeCurrentSlide === index ? 'active' : ''}`}
-                    type="button"
-                    aria-label={`${t.slide} ${index + 1}`}
-                    onClick={() => goToSlide(index)}
-                  ></button>
-                ))}
-              </div>
+              {sliderArticles.length > 1 && (
+                <div className="top-news-dots">
+                  {sliderArticles.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className={`top-news-dot ${
+                        index === currentIndex ? "active" : ""
+                      }`}
+                      onClick={() => setCurrentIndex(index)}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </>
           )}
         </div>
@@ -200,24 +184,30 @@ function TopNews({ articles = [] }) {
           <h3>{t.latest}</h3>
 
           <div className="latest-news-box">
-            <ul>
-              {latestArticles.length > 0 ? (
-                latestArticles.map((item) => (
-                  <li key={item.id}>
-                    <Link to={`/${language}/news/${item.slug}`}>
-                      {item.translation?.title || item.slug}
+            {error ? (
+              <ul>
+                <li>{t.error}</li>
+              </ul>
+            ) : sidebarArticles.length === 0 ? (
+              <ul>
+                <li>{t.empty}</li>
+              </ul>
+            ) : (
+              <ul>
+                {sidebarArticles.map((article) => (
+                  <li key={article.id}>
+                    <Link to={`/${language}/news/${article.slug}`}>
+                      {article.translation?.title || article.slug}
                     </Link>
                   </li>
-                ))
-              ) : (
-                <li>{t.empty}</li>
-              )}
-            </ul>
+                ))}
+              </ul>
+            )}
           </div>
         </aside>
       </div>
     </section>
-  )
+  );
 }
 
-export default TopNews
+export default TopNews;

@@ -3,6 +3,45 @@ import { Link, useNavigate } from 'react-router-dom'
 
 const API_BASE_URL = 'http://localhost:4000'
 
+function generateSlug(text = '') {
+  return text
+    .toLowerCase()
+    .replace(/а/g, 'a')
+    .replace(/б/g, 'b')
+    .replace(/в/g, 'v')
+    .replace(/г/g, 'g')
+    .replace(/д/g, 'd')
+    .replace(/е/g, 'e')
+    .replace(/ё/g, 'e')
+    .replace(/ж/g, 'zh')
+    .replace(/з/g, 'z')
+    .replace(/и/g, 'i')
+    .replace(/й/g, 'y')
+    .replace(/к/g, 'k')
+    .replace(/л/g, 'l')
+    .replace(/м/g, 'm')
+    .replace(/н/g, 'n')
+    .replace(/о/g, 'o')
+    .replace(/п/g, 'p')
+    .replace(/р/g, 'r')
+    .replace(/с/g, 's')
+    .replace(/т/g, 't')
+    .replace(/у/g, 'u')
+    .replace(/ф/g, 'f')
+    .replace(/х/g, 'h')
+    .replace(/ц/g, 'ts')
+    .replace(/ч/g, 'ch')
+    .replace(/ш/g, 'sh')
+    .replace(/щ/g, 'sch')
+    .replace(/ы/g, 'y')
+    .replace(/э/g, 'e')
+    .replace(/ю/g, 'yu')
+    .replace(/я/g, 'ya')
+    .replace(/ъ|ь/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+}
+
 function AdminCreateArticlePage() {
   const navigate = useNavigate()
   const token = localStorage.getItem('admin_token')
@@ -13,17 +52,22 @@ function AdminCreateArticlePage() {
   const [error, setError] = useState('')
 
   const [slug, setSlug] = useState('')
-  const [categoryId, setCategoryId] = useState('')
+  const [isSlugEdited, setIsSlugEdited] = useState(false)
+  const [categoryIds, setCategoryIds] = useState([])
   const [coverImage, setCoverImage] = useState('')
   const [isFeatured, setIsFeatured] = useState(false)
 
   const [ruTitle, setRuTitle] = useState('')
   const [ruExcerpt, setRuExcerpt] = useState('')
   const [ruContent, setRuContent] = useState('')
+  const [ruSeoTitle, setRuSeoTitle] = useState('')
+  const [ruSeoDescription, setRuSeoDescription] = useState('')
 
   const [uzTitle, setUzTitle] = useState('')
   const [uzExcerpt, setUzExcerpt] = useState('')
   const [uzContent, setUzContent] = useState('')
+  const [uzSeoTitle, setUzSeoTitle] = useState('')
+  const [uzSeoDescription, setUzSeoDescription] = useState('')
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -49,6 +93,20 @@ function AdminCreateArticlePage() {
     loadCategories()
   }, [])
 
+  useEffect(() => {
+    if (!isSlugEdited) {
+      setSlug(generateSlug(ruTitle))
+    }
+  }, [ruTitle, isSlugEdited])
+
+  const handleCategoryToggle = (categoryId) => {
+    setCategoryIds((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    )
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -56,15 +114,21 @@ function AdminCreateArticlePage() {
       setSubmitting(true)
       setError('')
 
+      if (!categoryIds.length) {
+        throw new Error('Выберите хотя бы одну категорию')
+      }
+
       const payload = {
         slug,
-        categoryId: Number(categoryId),
+        categoryIds,
         coverImage: coverImage || null,
         isFeatured,
         ru: {
           title: ruTitle,
           excerpt: ruExcerpt,
           content: ruContent,
+          seoTitle: ruSeoTitle,
+          seoDescription: ruSeoDescription,
         },
         uz:
           uzTitle && uzContent
@@ -72,6 +136,8 @@ function AdminCreateArticlePage() {
                 title: uzTitle,
                 excerpt: uzExcerpt,
                 content: uzContent,
+                seoTitle: uzSeoTitle,
+                seoDescription: uzSeoDescription,
               }
             : undefined,
       }
@@ -94,11 +160,13 @@ function AdminCreateArticlePage() {
       navigate('/dashboard')
     } catch (err) {
       console.error(err)
-      setError('Не удалось создать новость')
+      setError(err.message || 'Не удалось создать новость')
     } finally {
       setSubmitting(false)
     }
   }
+
+  const normalizedPreviewUrl = coverImage.trim()
 
   return (
     <main className="admin-dashboard-page">
@@ -123,38 +191,59 @@ function AdminCreateArticlePage() {
               <input
                 type="text"
                 value={slug}
-                onChange={(e) => setSlug(e.target.value)}
+                onChange={(e) => {
+                  setSlug(e.target.value)
+                  setIsSlugEdited(true)
+                }}
                 placeholder="weather-weekend-uzbekistan"
                 required
               />
             </label>
 
-            <label>
-              <span>Категория</span>
-              <select
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                required
-                disabled={loadingCategories}
-              >
-                <option value="">Выберите категорию</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.nameRu}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <div>
+              <span>Категории</span>
+              <div className="admin-categories-group">
+                {loadingCategories ? (
+                  <p>Загрузка категорий...</p>
+                ) : (
+                  categories.map((category) => (
+                    <label key={category.id} className="admin-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={categoryIds.includes(category.id)}
+                        onChange={() => handleCategoryToggle(category.id)}
+                      />
+                      <span>{category.nameRu}</span>
+                    </label>
+                  ))
+                )}
+              </div>
+            </div>
 
-            <label>
-              <span>Путь к картинке</span>
-              <input
-                type="text"
-                value={coverImage}
-                onChange={(e) => setCoverImage(e.target.value)}
-                placeholder="/Photos-for-Site/news.webp"
-              />
-            </label>
+            <div>
+              <label>
+                <span>Ссылка на картинку</span>
+                <input
+                  type="text"
+                  value={coverImage}
+                  onChange={(e) => setCoverImage(e.target.value)}
+                  placeholder="https://example.com/news.webp"
+                />
+              </label>
+
+              {normalizedPreviewUrl && (
+                <div className="admin-image-preview">
+                  <img
+                    src={normalizedPreviewUrl}
+                    alt="Предпросмотр"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                </div>
+              )}
+            </div>
 
             <label className="admin-checkbox">
               <input
@@ -197,6 +286,26 @@ function AdminCreateArticlePage() {
                 required
               />
             </label>
+
+            <label>
+              <span>SEO title</span>
+              <input
+                type="text"
+                value={ruSeoTitle}
+                onChange={(e) => setRuSeoTitle(e.target.value)}
+                placeholder="Заголовок для поисковиков"
+              />
+            </label>
+
+            <label>
+              <span>SEO description</span>
+              <textarea
+                value={ruSeoDescription}
+                onChange={(e) => setRuSeoDescription(e.target.value)}
+                rows={3}
+                placeholder="Описание для поисковиков"
+              />
+            </label>
           </div>
 
           <div className="admin-form-section">
@@ -226,6 +335,26 @@ function AdminCreateArticlePage() {
                 value={uzContent}
                 onChange={(e) => setUzContent(e.target.value)}
                 rows={10}
+              />
+            </label>
+
+            <label>
+              <span>SEO title</span>
+              <input
+                type="text"
+                value={uzSeoTitle}
+                onChange={(e) => setUzSeoTitle(e.target.value)}
+                placeholder="Qidiruv tizimlari uchun sarlavha"
+              />
+            </label>
+
+            <label>
+              <span>SEO description</span>
+              <textarea
+                value={uzSeoDescription}
+                onChange={(e) => setUzSeoDescription(e.target.value)}
+                rows={3}
+                placeholder="Qidiruv tizimlari uchun tavsif"
               />
             </label>
           </div>

@@ -21,16 +21,18 @@ function HomePage({ onOpenReel }) {
     ru: {
       title: 'Новости Узбекистана и мира',
       description:
-        'Свежие новости Узбекистана и мира: политика, происшествия, экономика, технологии. Читайте быстро и по делу.',
+        'Свежие новости Узбекистана и мира: политика, экономика, происшествия и технологии.',
     },
     uz: {
       title: 'O‘zbekiston va dunyo yangiliklari',
       description:
-        'O‘zbekiston va dunyodagi so‘nggi yangiliklar: siyosat, hodisalar, iqtisodiyot va texnologiyalar.',
+        'O‘zbekiston va dunyodagi eng so‘nggi yangiliklar: siyosat, iqtisodiyot va texnologiyalar.',
     },
   }
 
   const t = seoContent[language] || seoContent.ru
+
+  const locale = language === 'uz' ? 'uz_UZ' : 'ru_RU'
   const canonical = `/${language}`
 
   useEffect(() => {
@@ -47,23 +49,19 @@ function HomePage({ onOpenReel }) {
         const data = await response.json()
 
         if (!response.ok || !data.ok) {
-          throw new Error(data.message || 'Failed to load articles')
+          throw new Error()
         }
 
         if (isMounted) {
           setArticles(data.articles || [])
         }
-      } catch (err) {
-        console.error('Failed to load home articles:', err)
-
+      } catch {
         if (isMounted) {
           setArticles([])
           setError('Failed to load articles')
         }
       } finally {
-        if (isMounted) {
-          setLoading(false)
-        }
+        if (isMounted) setLoading(false)
       }
     }
 
@@ -74,14 +72,26 @@ function HomePage({ onOpenReel }) {
     }
   }, [language])
 
-  const featuredArticles = articles.filter((article) => article.isFeatured)
-  const nonFeaturedArticles = articles.filter((article) => !article.isFeatured)
+  const featured = articles.filter((article) => article.isFeatured)
+  const nonFeatured = articles.filter((article) => !article.isFeatured)
 
-  const topNewsArticles =
-    featuredArticles.length > 0 ? featuredArticles.slice(0, 5) : articles.slice(0, 5)
+  const uzbekistanNews = nonFeatured.filter(
+    (article) => article.category?.slug === 'uzbekistan'
+  )
 
-  const newsFeedArticles = nonFeaturedArticles.slice(0, 8)
-  const moreNewsArticles = nonFeaturedArticles.slice(8)
+  const featuredArticles =
+    featured.length > 0 ? featured.slice(0, 5) : articles.slice(0, 5)
+
+  const latestArticles = articles.slice(0, 8)
+
+  const newsFeedArticles = uzbekistanNews.slice(0, 8)
+
+  const featuredIds = new Set(featuredArticles.map((article) => article.id))
+  const uzbekistanIds = new Set(newsFeedArticles.map((article) => article.id))
+
+  const moreNewsArticles = nonFeatured.filter(
+    (article) => !featuredIds.has(article.id) && !uzbekistanIds.has(article.id)
+  )
 
   if (loading) {
     return (
@@ -97,9 +107,15 @@ function HomePage({ onOpenReel }) {
         title={t.title}
         description={t.description}
         canonical={canonical}
+        locale={locale}
+        image="/preview.jpg"
       />
 
-      <TopNews articles={topNewsArticles} />
+      <TopNews
+        featuredArticles={featuredArticles}
+        latestArticles={latestArticles}
+        error={error}
+      />
 
       <AdBlock />
 

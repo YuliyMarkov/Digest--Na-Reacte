@@ -53,6 +53,8 @@ function MoreNews({ articles = [], error = '' }) {
           <div className="more-news-grid">
             {visibleNews.map((article) => {
               const title = article.translation?.title || article.slug
+              const seoTitle = article.translation?.seoTitle?.trim() || ''
+              const alt = seoTitle || title
               const text = article.translation?.excerpt || ''
 
               return (
@@ -60,11 +62,12 @@ function MoreNews({ articles = [], error = '' }) {
                   <Link
                     to={`/${language}/news/${article.slug}`}
                     className="more-news-card-link"
+                    title={alt}
                   >
                     {article.coverImage && (
                       <img
                         src={article.coverImage}
-                        alt={title}
+                        alt={alt}
                         loading="lazy"
                         decoding="async"
                         width="800"

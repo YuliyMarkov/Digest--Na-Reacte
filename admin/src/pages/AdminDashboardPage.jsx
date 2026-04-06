@@ -76,13 +76,19 @@ function AdminDashboardPage() {
         <div className="admin-dashboard-top">
           <div>
             <h1>Админ-панель</h1>
-            <p>Управление новостями</p>
+            <p>Управление контентом</p>
           </div>
 
           <div className="admin-dashboard-actions">
             <Link to="/articles/new" className="admin-primary-link">
               Создать новость
             </Link>
+
+            {/* 🔥 ВОТ ЭТО МЫ ДОБАВИЛИ */}
+            <Link to="/reels" className="admin-secondary-link">
+              Управление Reels
+            </Link>
+
             <button onClick={handleLogout}>Выйти</button>
           </div>
         </div>

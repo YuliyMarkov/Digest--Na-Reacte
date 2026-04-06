@@ -23,6 +23,7 @@ enum Locale {
 }
 
 enum MediaType {
+  reel
   instagram
   youtube
   video
@@ -115,7 +116,7 @@ model MediaItem {
   id           Int       @id @default(autoincrement())
   titleRu      String?
   titleUz      String?
-  type         MediaType
+  type         MediaType @default(reel)
   previewImage String?
   videoUrl     String
   sortOrder    Int       @default(0)

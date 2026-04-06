@@ -43,6 +43,8 @@ function NewsFeed({ articles = [], error = "" }) {
           <div className="news-feed">
             {articles.slice(0, 6).map((article) => {
               const title = article.translation?.title || article.slug;
+              const seoTitle = article.translation?.seoTitle?.trim() || "";
+              const alt = seoTitle || title;
               const text = article.translation?.excerpt || "";
 
               return (
@@ -50,11 +52,12 @@ function NewsFeed({ articles = [], error = "" }) {
                   <Link
                     to={`/${language}/news/${article.slug}`}
                     className="news-card-link"
+                    title={alt}
                   >
                     {article.coverImage && (
                       <img
                         src={article.coverImage}
-                        alt={title}
+                        alt={alt}
                         loading="lazy"
                         decoding="async"
                         width="800"

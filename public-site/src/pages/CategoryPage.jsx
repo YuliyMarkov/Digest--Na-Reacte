@@ -83,6 +83,7 @@ function CategoryPage() {
   const seoDescription =
     seoDescriptions[language]?.[slug] || seoDescriptions[language]?.default;
   const canonical = `/${language}/category/${slug}`;
+  const locale = language === "uz" ? "uz_UZ" : "ru_RU";
 
   const [articles, setArticles] = useState([]);
   const [visibleCount, setVisibleCount] = useState(batchSize);
@@ -152,6 +153,7 @@ function CategoryPage() {
           description={seoDescription}
           canonical={canonical}
           type="website"
+          locale={locale}
         />
         <Loader />
       </main>
@@ -165,6 +167,7 @@ function CategoryPage() {
         description={seoDescription}
         canonical={canonical}
         type="website"
+        locale={locale}
       />
 
       <section className="category-news-section">
@@ -186,7 +189,9 @@ function CategoryPage() {
           <>
             <div className="category-news-grid">
               {visibleArticles.map((article) => {
-                const title = article.translation?.title || "";
+                const title = article.translation?.title || article.slug;
+                const seoTitle = article.translation?.seoTitle?.trim() || "";
+                const imageAlt = seoTitle || title;
                 const text = article.translation?.excerpt || "";
 
                 return (
@@ -194,11 +199,18 @@ function CategoryPage() {
                     <Link
                       to={`/${language}/news/${article.slug}`}
                       className="category-news-card-link"
+                      title={imageAlt}
                     >
-                      <img
-                        src={article.coverImage}
-                        alt={title}
-                      />
+                      {article.coverImage && (
+                        <img
+                          src={article.coverImage}
+                          alt={imageAlt}
+                          loading="lazy"
+                          decoding="async"
+                          width="800"
+                          height="450"
+                        />
+                      )}
                       <h3>{title}</h3>
                       <p>{text}</p>
                     </Link>

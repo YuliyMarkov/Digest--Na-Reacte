@@ -1,24 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '../context/useLanguage'
 
-const reels = [
-  {
-    image: '/Reels/Darhan.webp',
-    video: 'https://www.instagram.com/p/DV8gBEZAux0/embed',
-  },
-  {
-    image: '/Reels/Gaz.webp',
-    video: 'https://www.instagram.com/p/DV8XmoIgmVh/embed',
-  },
-  {
-    image: '/Reels/Most.webp',
-    video: 'https://www.instagram.com/p/DV8BO1wAu41/embed',
-  },
-  {
-    image: '/Reels/Pagani.webp',
-    video: 'https://www.instagram.com/p/DV76ofGg3ut/embed',
-  },
-]
+const API_BASE_URL = 'http://localhost:4000'
 
 function ReelsSection({ onOpenReel }) {
   const { language } = useLanguage()
@@ -26,6 +9,9 @@ function ReelsSection({ onOpenReel }) {
   const viewportRef = useRef(null)
   const trackRef = useRef(null)
 
+  const [reels, setReels] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [index, setIndex] = useState(0)
   const [step, setStep] = useState(0)
   const [visibleCount, setVisibleCount] = useState(1)
@@ -37,6 +23,7 @@ function ReelsSection({ onOpenReel }) {
       next: 'Следующее видео',
       instagram: 'Instagram',
       allVideos: 'Смотреть все видео →',
+      empty: 'Видео пока нет',
     },
     uz: {
       title: 'Video',
@@ -44,12 +31,64 @@ function ReelsSection({ onOpenReel }) {
       next: 'Keyingi video',
       instagram: 'Instagram',
       allVideos: 'Barcha videolarni ko‘rish →',
+      empty: 'Videolar hozircha yo‘q',
     },
   }
 
   const t = uiText[language] || uiText.ru
 
-  const totalItems = reels.length + 1
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadReels() {
+      try {
+        setLoading(true)
+        setError('')
+
+        const response = await fetch(
+          `${API_BASE_URL}/api/media?type=reel&visibleOnly=true`
+        )
+        const data = await response.json()
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.message || 'Failed to load reels')
+        }
+
+        const normalizedReels = (data.mediaItems || []).map((item) => ({
+          id: item.id,
+          image: item.previewImage || '',
+          video: item.videoUrl || '',
+          title:
+            language === 'uz'
+              ? item.titleUz || item.titleRu || ''
+              : item.titleRu || item.titleUz || '',
+        }))
+
+        if (isMounted) {
+          setReels(normalizedReels)
+        }
+      } catch (err) {
+        console.error('Failed to load reels:', err)
+
+        if (isMounted) {
+          setReels([])
+          setError('Failed to load reels')
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadReels()
+
+    return () => {
+      isMounted = false
+    }
+  }, [language])
+
+  const totalItems = reels.length > 0 ? reels.length + 1 : 0
   const maxIndex = Math.max(0, totalItems - visibleCount)
 
   useEffect(() => {
@@ -89,12 +128,44 @@ function ReelsSection({ onOpenReel }) {
     }
   }, [totalItems])
 
+  useEffect(() => {
+    setIndex(0)
+  }, [reels.length])
+
   const next = () => {
     setIndex((prev) => Math.min(prev + 1, maxIndex))
   }
 
   const prev = () => {
     setIndex((prev) => Math.max(prev - 1, 0))
+  }
+
+  if (loading) {
+    return (
+      <section className="reels-section">
+        <div className="reels-header">
+          <h2>{t.title}</h2>
+        </div>
+
+        <div className="more-news-empty">
+          <p>{t.title}...</p>
+        </div>
+      </section>
+    )
+  }
+
+  if (error || reels.length === 0) {
+    return (
+      <section className="reels-section">
+        <div className="reels-header">
+          <h2>{t.title}</h2>
+        </div>
+
+        <div className="more-news-empty">
+          <p>{t.empty}</p>
+        </div>
+      </section>
+    )
   }
 
   return (
@@ -133,23 +204,26 @@ function ReelsSection({ onOpenReel }) {
             transform: `translateX(-${index * step}px)`,
           }}
         >
-          {reels.map((reel, i) => (
-            <li className="reels-list-item" key={i}>
+          {reels.map((reel) => (
+            <li className="reels-list-item" key={reel.id}>
               <div className="reels-card">
                 <button
                   className="reels-card-preview"
                   type="button"
                   onClick={() => onOpenReel(reel.video)}
+                  title={reel.title || t.instagram}
                 >
                   <span className="reels-card-image">
-                    <img
-                      src={reel.image}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      width="360"
-                      height="640"
-                    />
+                    {reel.image && (
+                      <img
+                        src={reel.image}
+                        alt={reel.title || t.instagram}
+                        loading="lazy"
+                        decoding="async"
+                        width="360"
+                        height="640"
+                      />
+                    )}
                   </span>
 
                   <span className="reels-card-play">▶</span>

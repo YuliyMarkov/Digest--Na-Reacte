@@ -12,6 +12,8 @@ function Header() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [desktopSearchQuery, setDesktopSearchQuery] = useState('')
+  const [mobileSearchQuery, setMobileSearchQuery] = useState('')
   const [isDarkTheme, setIsDarkTheme] = useState(() => {
     return localStorage.getItem('theme') === 'dark'
   })
@@ -128,6 +130,32 @@ function Header() {
     setIsMenuOpen(false)
   }
 
+  const submitSearch = (rawQuery, options = {}) => {
+    const query = rawQuery.trim()
+
+    if (!query) return
+
+    navigate(`/${language}/search?q=${encodeURIComponent(query)}`)
+
+    if (options.closeMenu) {
+      setIsMenuOpen(false)
+    }
+
+    if (options.closeDesktopSearch) {
+      setIsSearchOpen(false)
+    }
+  }
+
+  const handleDesktopSearchSubmit = (e) => {
+    e.preventDefault()
+    submitSearch(desktopSearchQuery, { closeDesktopSearch: true })
+  }
+
+  const handleMobileSearchSubmit = (e) => {
+    e.preventDefault()
+    submitSearch(mobileSearchQuery, { closeMenu: true })
+  }
+
   return (
     <header className="header">
       <div className="container header-container">
@@ -196,6 +224,7 @@ function Header() {
             className="mobile-search-form"
             id="mobileSearchForm"
             role="search"
+            onSubmit={handleMobileSearchSubmit}
           >
             <div className="mobile-search-row">
               <input
@@ -204,6 +233,8 @@ function Header() {
                 className="mobile-search-input"
                 placeholder={t.searchPlaceholder}
                 aria-label={t.searchPlaceholder}
+                value={mobileSearchQuery}
+                onChange={(e) => setMobileSearchQuery(e.target.value)}
               />
               <button type="submit" className="mobile-search-btn">
                 {t.searchButton}
@@ -328,6 +359,7 @@ function Header() {
             className="desktop-search-form"
             id="desktopSearchForm"
             role="search"
+            onSubmit={handleDesktopSearchSubmit}
           >
             <input
               type="search"
@@ -335,6 +367,8 @@ function Header() {
               className="desktop-search-input"
               placeholder={t.searchPlaceholder}
               aria-label={t.searchPlaceholder}
+              value={desktopSearchQuery}
+              onChange={(e) => setDesktopSearchQuery(e.target.value)}
             />
             <button type="submit" className="desktop-search-btn">
               {t.searchButton}

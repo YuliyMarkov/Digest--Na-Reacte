@@ -28,8 +28,9 @@ function getCategoryName(category, language) {
 
 function splitContentToParagraphs(content) {
   if (!content || typeof content !== "string") return [];
+
   return content
-    .split(/\n\s*\n/)
+    .split(/\n+/)
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
 }
@@ -89,6 +90,7 @@ function NewsPage() {
   };
 
   const t = uiText[language] || uiText.ru;
+  const locale = language === "uz" ? "uz_UZ" : "ru_RU";
 
   useEffect(() => {
     let isMounted = true;
@@ -201,14 +203,17 @@ function NewsPage() {
   const localizedTitle = article?.translation?.title || "";
   const localizedDate = formatArticleDate(article?.publishedAt, language);
   const localizedExcerpt = article?.translation?.excerpt || "";
+  const localizedSeoTitle = article?.translation?.seoTitle?.trim() || "";
+  const localizedSeoDescription =
+    article?.translation?.seoDescription?.trim() || "";
+
   const localizedContent = useMemo(() => {
     return splitContentToParagraphs(article?.translation?.content);
   }, [article?.translation?.content]);
 
   const categorySlug = article?.category?.slug || "uzbekistan";
-  const shareUrl =
-    typeof window !== "undefined" ? window.location.href : "";
-  const shareTitle = localizedTitle;
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const shareTitle = localizedSeoTitle || localizedTitle;
 
   const shareLinks = {
     telegram: `https://t.me/share/url?url=${encodeURIComponent(
@@ -229,11 +234,15 @@ function NewsPage() {
     ) ||
     t.fallbackDescription;
 
-  const seoDescription =
-    descriptionFromContent.length > 160
-      ? `${descriptionFromContent.slice(0, 157)}...`
-      : descriptionFromContent;
+  const seoDescriptionSource =
+    localizedSeoDescription || descriptionFromContent || t.fallbackDescription;
 
+  const seoDescription =
+    seoDescriptionSource.length > 160
+      ? `${seoDescriptionSource.slice(0, 157)}...`
+      : seoDescriptionSource;
+
+  const seoTitle = localizedSeoTitle || localizedTitle || t.notFoundTitle;
   const canonical = `/${language}/news/${slug}`;
 
   const publishedDateIso = article?.publishedAt || null;
@@ -243,7 +252,7 @@ function NewsPage() {
     ? {
         "@context": "https://schema.org",
         "@type": "NewsArticle",
-        headline: localizedTitle,
+        headline: seoTitle,
         description: seoDescription,
         image: article.coverImage
           ? [
@@ -343,6 +352,7 @@ function NewsPage() {
           description={t.notFoundText}
           canonical={`/${language}/news/${slug}`}
           type="article"
+          locale={locale}
         />
 
         <section className="article-page">
@@ -362,6 +372,7 @@ function NewsPage() {
           description={t.loadError}
           canonical={`/${language}/news/${slug}`}
           type="article"
+          locale={locale}
         />
 
         <section className="article-page">
@@ -376,12 +387,13 @@ function NewsPage() {
   return (
     <main className="main container">
       <Seo
-        title={localizedTitle}
+        title={seoTitle}
         description={seoDescription}
         canonical={canonical}
         image={article.coverImage || ""}
         type="article"
         schema={schema}
+        locale={locale}
       />
 
       <section className="article-page">
@@ -403,7 +415,7 @@ function NewsPage() {
             <h1>{localizedTitle}</h1>
 
             {article.coverImage && (
-              <img src={article.coverImage} alt={localizedTitle} />
+              <img src={article.coverImage} alt={seoTitle || localizedTitle} />
             )}
 
             {localizedContent.map((paragraph, index) => (
@@ -578,14 +590,16 @@ function NewsPage() {
           {moreArticles.map((item) => {
             const title = item.translation?.title || "";
             const text = item.translation?.excerpt || "";
+            const seoAlt = item.translation?.seoTitle?.trim() || title;
 
             return (
               <article className="more-news-card" key={item.id}>
                 <Link
                   to={`/${language}/news/${item.slug}`}
                   className="more-news-card-link"
+                  title={seoAlt}
                 >
-                  {item.coverImage && <img src={item.coverImage} alt={title} />}
+                  {item.coverImage && <img src={item.coverImage} alt={seoAlt} />}
                   <h3>{title}</h3>
                   <p>{text}</p>
                 </Link>

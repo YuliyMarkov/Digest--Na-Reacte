@@ -12,6 +12,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactsPage from "./pages/ContactsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import SearchPage from './pages/SearchPage'
 
 function CategoryPageWrapper() {
   const { slug } = useParams();
@@ -53,6 +54,7 @@ function App() {
         <Route path="/:lang/about" element={<AboutPage />} />
         <Route path="/:lang/contacts" element={<ContactsPage />} />
         <Route path="/:lang/privacy" element={<PrivacyPage />} />
+        <Route path="/:lang/search" element={<SearchPage />} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
