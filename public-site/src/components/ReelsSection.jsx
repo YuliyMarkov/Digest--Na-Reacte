@@ -1,144 +1,141 @@
-import { useEffect, useRef, useState } from 'react'
-import { useLanguage } from '../context/useLanguage'
+import { useEffect, useRef, useState } from "react";
+import { useLanguage } from "../context/useLanguage";
 
-const API_BASE_URL = 'http://localhost:4000'
+const API_BASE_URL = "http://192.168.1.31:4000";
 
 function ReelsSection({ onOpenReel }) {
-  const { language } = useLanguage()
+  const { language } = useLanguage();
 
-  const viewportRef = useRef(null)
-  const trackRef = useRef(null)
+  const viewportRef = useRef(null);
+  const trackRef = useRef(null);
 
-  const [reels, setReels] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [index, setIndex] = useState(0)
-  const [step, setStep] = useState(0)
-  const [visibleCount, setVisibleCount] = useState(1)
+  const [reels, setReels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [index, setIndex] = useState(0);
+  const [step, setStep] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(1);
 
   const uiText = {
     ru: {
-      title: 'Видео',
-      prev: 'Предыдущее видео',
-      next: 'Следующее видео',
-      instagram: 'Instagram',
-      allVideos: 'Смотреть все видео →',
-      empty: 'Видео пока нет',
+      title: "Видео",
+      prev: "Предыдущее видео",
+      next: "Следующее видео",
+      instagram: "Instagram",
+      allVideos: "Смотреть все видео →",
+      empty: "Видео пока нет",
     },
     uz: {
-      title: 'Video',
-      prev: 'Oldingi video',
-      next: 'Keyingi video',
-      instagram: 'Instagram',
-      allVideos: 'Barcha videolarni ko‘rish →',
-      empty: 'Videolar hozircha yo‘q',
+      title: "Video",
+      prev: "Oldingi video",
+      next: "Keyingi video",
+      instagram: "Instagram",
+      allVideos: "Barcha videolarni ko‘rish →",
+      empty: "Videolar hozircha yo‘q",
     },
-  }
+  };
 
-  const t = uiText[language] || uiText.ru
+  const t = uiText[language] || uiText.ru;
+  const totalItems = reels.length > 0 ? reels.length + 1 : 0;
+  const maxIndex = Math.max(0, totalItems - visibleCount);
 
   useEffect(() => {
-    let isMounted = true
+    const controller = new AbortController();
 
     async function loadReels() {
       try {
-        setLoading(true)
-        setError('')
+        setLoading(true);
+        setError("");
 
         const response = await fetch(
-          `${API_BASE_URL}/api/media?type=reel&visibleOnly=true`
-        )
-        const data = await response.json()
+          `${API_BASE_URL}/api/media?type=reel&visibleOnly=true`,
+          { signal: controller.signal }
+        );
+
+        const data = await response.json();
 
         if (!response.ok || !data.ok) {
-          throw new Error(data.message || 'Failed to load reels')
+          throw new Error(data.message || "Failed to load reels");
         }
 
         const normalizedReels = (data.mediaItems || []).map((item) => ({
           id: item.id,
-          image: item.previewImage || '',
-          video: item.videoUrl || '',
+          image: item.previewImage || "",
+          video: item.videoUrl || "",
           title:
-            language === 'uz'
-              ? item.titleUz || item.titleRu || ''
-              : item.titleRu || item.titleUz || '',
-        }))
+            language === "uz"
+              ? item.titleUz || item.titleRu || ""
+              : item.titleRu || item.titleUz || "",
+        }));
 
-        if (isMounted) {
-          setReels(normalizedReels)
-        }
+        setReels(normalizedReels);
       } catch (err) {
-        console.error('Failed to load reels:', err)
+        if (err.name === "AbortError") return;
 
-        if (isMounted) {
-          setReels([])
-          setError('Failed to load reels')
-        }
+        setReels([]);
+        setError("Failed to load reels");
       } finally {
-        if (isMounted) {
-          setLoading(false)
+        if (!controller.signal.aborted) {
+          setLoading(false);
         }
       }
     }
 
-    loadReels()
+    loadReels();
 
     return () => {
-      isMounted = false
-    }
-  }, [language])
-
-  const totalItems = reels.length > 0 ? reels.length + 1 : 0
-  const maxIndex = Math.max(0, totalItems - visibleCount)
+      controller.abort();
+    };
+  }, [language]);
 
   useEffect(() => {
     const updateMetrics = () => {
-      if (!viewportRef.current || !trackRef.current) return
+      if (!viewportRef.current || !trackRef.current) return;
 
       const firstItem = trackRef.current.querySelector(
-        '.reels-list-item, .reels-list-item-more'
-      )
+        ".reels-list-item, .reels-list-item-more"
+      );
 
-      if (!firstItem) return
+      if (!firstItem) return;
 
-      const itemWidth = firstItem.getBoundingClientRect().width
-      const trackStyle = window.getComputedStyle(trackRef.current)
-      const gap = parseFloat(trackStyle.columnGap || trackStyle.gap || '0') || 0
-      const fullStep = itemWidth + gap
+      const itemWidth = firstItem.getBoundingClientRect().width;
+      const trackStyle = window.getComputedStyle(trackRef.current);
+      const gap = parseFloat(trackStyle.columnGap || trackStyle.gap || "0") || 0;
+      const fullStep = itemWidth + gap;
+      const viewportWidth = viewportRef.current.getBoundingClientRect().width;
 
-      const viewportWidth = viewportRef.current.getBoundingClientRect().width
+      let nextVisibleCount = Math.floor((viewportWidth + gap) / fullStep);
 
-      let nextVisibleCount = Math.floor((viewportWidth + gap) / fullStep)
       if (!Number.isFinite(nextVisibleCount) || nextVisibleCount < 1) {
-        nextVisibleCount = 1
+        nextVisibleCount = 1;
       }
 
-      const nextMaxIndex = Math.max(0, totalItems - nextVisibleCount)
+      const nextMaxIndex = Math.max(0, totalItems - nextVisibleCount);
 
-      setStep(fullStep)
-      setVisibleCount(nextVisibleCount)
-      setIndex((prev) => Math.min(prev, nextMaxIndex))
-    }
+      setStep(fullStep);
+      setVisibleCount(nextVisibleCount);
+      setIndex((prev) => Math.min(prev, nextMaxIndex));
+    };
 
-    updateMetrics()
-    window.addEventListener('resize', updateMetrics)
+    updateMetrics();
+    window.addEventListener("resize", updateMetrics);
 
     return () => {
-      window.removeEventListener('resize', updateMetrics)
-    }
-  }, [totalItems])
+      window.removeEventListener("resize", updateMetrics);
+    };
+  }, [totalItems]);
 
   useEffect(() => {
-    setIndex(0)
-  }, [reels.length])
+    setIndex(0);
+  }, [reels.length]);
 
   const next = () => {
-    setIndex((prev) => Math.min(prev + 1, maxIndex))
-  }
+    setIndex((prev) => Math.min(prev + 1, maxIndex));
+  };
 
   const prev = () => {
-    setIndex((prev) => Math.max(prev - 1, 0))
-  }
+    setIndex((prev) => Math.max(prev - 1, 0));
+  };
 
   if (loading) {
     return (
@@ -151,7 +148,7 @@ function ReelsSection({ onOpenReel }) {
           <p>{t.title}...</p>
         </div>
       </section>
-    )
+    );
   }
 
   if (error || reels.length === 0) {
@@ -165,7 +162,7 @@ function ReelsSection({ onOpenReel }) {
           <p>{t.empty}</p>
         </div>
       </section>
-    )
+    );
   }
 
   return (
@@ -220,6 +217,7 @@ function ReelsSection({ onOpenReel }) {
                         alt={reel.title || t.instagram}
                         loading="lazy"
                         decoding="async"
+                        fetchPriority="low"
                         width="360"
                         height="640"
                       />
@@ -254,7 +252,7 @@ function ReelsSection({ onOpenReel }) {
         </ul>
       </div>
     </section>
-  )
+  );
 }
 
-export default ReelsSection
+export default ReelsSection;

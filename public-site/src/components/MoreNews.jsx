@@ -1,38 +1,37 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useLanguage } from '../context/useLanguage'
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useLanguage } from "../context/useLanguage";
 
-const batchSize = 4
+const batchSize = 4;
 
-function MoreNews({ articles = [], error = '' }) {
-  const { language } = useLanguage()
-
-  const [visibleCount, setVisibleCount] = useState(batchSize)
+function MoreNews({ articles = [], error = "" }) {
+  const { language } = useLanguage();
+  const [visibleCount, setVisibleCount] = useState(batchSize);
 
   const uiText = {
     ru: {
-      allNews: 'Все новости',
-      loadMore: 'Больше новостей',
-      empty: 'Пока нет новостей',
-      error: 'Не удалось загрузить новости',
+      allNews: "Все новости",
+      loadMore: "Больше новостей",
+      empty: "Пока нет новостей",
+      error: "Не удалось загрузить новости",
     },
     uz: {
-      allNews: 'Barcha yangiliklar',
-      loadMore: 'Ko‘proq yangilik',
-      empty: 'Hozircha yangiliklar yo‘q',
-      error: 'Yangiliklarni yuklab bo‘lmadi',
+      allNews: "Barcha yangiliklar",
+      loadMore: "Ko‘proq yangilik",
+      empty: "Hozircha yangiliklar yo‘q",
+      error: "Yangiliklarni yuklab bo‘lmadi",
     },
-  }
+  };
 
-  const t = uiText[language] || uiText.ru
+  const t = uiText[language] || uiText.ru;
 
-  const safeVisibleCount = Math.min(visibleCount, articles.length || batchSize)
-  const visibleNews = articles.slice(0, safeVisibleCount)
-  const hasMore = safeVisibleCount < articles.length
+  const safeVisibleCount = Math.min(visibleCount, articles.length || batchSize);
+  const visibleNews = articles.slice(0, safeVisibleCount);
+  const hasMore = safeVisibleCount < articles.length;
 
   const handleLoadMore = () => {
-    setVisibleCount((prev) => Math.min(prev + batchSize, articles.length))
-  }
+    setVisibleCount((prev) => Math.min(prev + batchSize, articles.length));
+  };
 
   return (
     <section className="more-news-section">
@@ -52,10 +51,10 @@ function MoreNews({ articles = [], error = '' }) {
         <>
           <div className="more-news-grid">
             {visibleNews.map((article) => {
-              const title = article.translation?.title || article.slug
-              const seoTitle = article.translation?.seoTitle?.trim() || ''
-              const alt = seoTitle || title
-              const text = article.translation?.excerpt || ''
+              const title = article.translation?.title || article.slug;
+              const seoTitle = article.translation?.seoTitle?.trim() || "";
+              const alt = seoTitle || title;
+              const text = article.translation?.excerpt || "";
 
               return (
                 <article className="more-news-card" key={article.id}>
@@ -70,15 +69,17 @@ function MoreNews({ articles = [], error = '' }) {
                         alt={alt}
                         loading="lazy"
                         decoding="async"
+                        fetchPriority="low"
                         width="800"
                         height="450"
                       />
                     )}
+
                     <h3>{title}</h3>
                     <p>{text}</p>
                   </Link>
                 </article>
-              )
+              );
             })}
           </div>
 
@@ -96,7 +97,7 @@ function MoreNews({ articles = [], error = '' }) {
         </>
       )}
     </section>
-  )
+  );
 }
 
-export default MoreNews
+export default MoreNews;

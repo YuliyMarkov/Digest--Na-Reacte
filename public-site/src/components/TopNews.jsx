@@ -126,7 +126,7 @@ function TopNews({
                     ref={trackRef}
                     style={{ transform: `translateX(-${currentIndex * 100}%)` }}
                   >
-                    {sliderArticles.map((article) => {
+                    {sliderArticles.map((article, index) => {
                       const title = article.translation?.title || article.slug;
                       const seoTitle =
                         article.translation?.seoTitle?.trim() || title;
@@ -139,7 +139,15 @@ function TopNews({
                             title={seoTitle}
                           >
                             {article.coverImage && (
-                              <img src={article.coverImage} alt={seoTitle} />
+                              <img
+                                src={article.coverImage}
+                                alt={seoTitle}
+                                loading={index === 0 ? "eager" : "lazy"}
+                                fetchpriority={
+                                  index === 0 ? "high" : "auto"
+                                }
+                                decoding="async"
+                              />
                             )}
                             <div className="top-slide-overlay">
                               <h3>{title}</h3>

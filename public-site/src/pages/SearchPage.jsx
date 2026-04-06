@@ -5,7 +5,7 @@ import Loader from '../components/Loader'
 import Seo from '../components/Seo'
 import AdBlock from '../components/AdBlock'
 
-const API_BASE_URL = 'http://localhost:4000'
+const API_BASE_URL = 'http://192.168.1.31:4000'
 
 function SearchPage() {
   const { language } = useLanguage()

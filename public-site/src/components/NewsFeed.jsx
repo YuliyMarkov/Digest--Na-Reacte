@@ -20,6 +20,7 @@ function NewsFeed({ articles = [], error = "" }) {
   };
 
   const t = uiText[language] || uiText.ru;
+  const visibleArticles = articles.slice(0, 6);
 
   return (
     <section className="content-grid">
@@ -35,13 +36,13 @@ function NewsFeed({ articles = [], error = "" }) {
           <div className="news-feed-empty">
             <p>{t.error}</p>
           </div>
-        ) : articles.length === 0 ? (
+        ) : visibleArticles.length === 0 ? (
           <div className="news-feed-empty">
             <p>{t.empty}</p>
           </div>
         ) : (
           <div className="news-feed">
-            {articles.slice(0, 6).map((article) => {
+            {visibleArticles.map((article) => {
               const title = article.translation?.title || article.slug;
               const seoTitle = article.translation?.seoTitle?.trim() || "";
               const alt = seoTitle || title;
@@ -60,10 +61,12 @@ function NewsFeed({ articles = [], error = "" }) {
                         alt={alt}
                         loading="lazy"
                         decoding="async"
+                        fetchPriority="low"
                         width="800"
                         height="450"
                       />
                     )}
+
                     <h3>{title}</h3>
                     <p>{text}</p>
                   </Link>
