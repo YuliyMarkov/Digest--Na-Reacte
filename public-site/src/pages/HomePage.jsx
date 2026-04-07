@@ -4,7 +4,6 @@ import NewsFeed from "../components/NewsFeed";
 import ReelsSection from "../components/ReelsSection";
 import MoreNews from "../components/MoreNews";
 import AdBlock from "../components/AdBlock";
-import Loader from "../components/Loader";
 import { useLanguage } from "../context/useLanguage";
 import Seo from "../components/Seo";
 
@@ -107,15 +106,8 @@ function HomePage({ onOpenReel }) {
     };
   }, [articles]);
 
-  if (loading) {
-    return (
-      <main className="main container">
-        <Loader />
-      </main>
-    );
-  }
-
   const firstImage = featuredArticles[0]?.coverImage || "";
+  const componentError = loading ? "" : error;
 
   return (
     <main className="main container">
@@ -131,18 +123,18 @@ function HomePage({ onOpenReel }) {
       <TopNews
         featuredArticles={featuredArticles}
         latestArticles={latestArticles}
-        error={error}
+        error={componentError}
       />
 
       <AdBlock />
 
-      <NewsFeed articles={newsFeedArticles} error={error} />
+      <NewsFeed articles={newsFeedArticles} error={componentError} />
 
       <ReelsSection onOpenReel={onOpenReel} />
 
       <AdBlock />
 
-      <MoreNews articles={moreNewsArticles} error={error} />
+      <MoreNews articles={moreNewsArticles} error={componentError} />
     </main>
   );
 }

@@ -19,12 +19,16 @@ function TopNews({
       latest: "Последние новости",
       empty: "Пока нет новостей",
       error: "Не удалось загрузить новости",
+      prev: "Previous slide",
+      next: "Next slide",
     },
     uz: {
       main: "Asosiy",
       latest: "So‘nggi yangiliklar",
       empty: "Hozircha yangiliklar yo‘q",
       error: "Yangiliklarni yuklab bo‘lmadi",
+      prev: "Previous slide",
+      next: "Next slide",
     },
   };
 
@@ -110,7 +114,7 @@ function TopNews({
                   type="button"
                   className="slider-btn prev"
                   onClick={goToPrev}
-                  aria-label="Previous slide"
+                  aria-label={t.prev}
                 >
                   ‹
                 </button>
@@ -124,7 +128,12 @@ function TopNews({
                   <div
                     className="top-news-track"
                     ref={trackRef}
-                    style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                    style={{
+                      transform:
+                        currentIndex === 0
+                          ? "translateX(0)"
+                          : `translateX(-${currentIndex * 100}%)`,
+                    }}
                   >
                     {sliderArticles.map((article, index) => {
                       const title = article.translation?.title || article.slug;
@@ -142,13 +151,14 @@ function TopNews({
                               <img
                                 src={article.coverImage}
                                 alt={seoTitle}
+                                width="1200"
+                                height="630"
                                 loading={index === 0 ? "eager" : "lazy"}
-                                fetchpriority={
-                                  index === 0 ? "high" : "auto"
-                                }
+                                fetchPriority={index === 0 ? "high" : "auto"}
                                 decoding="async"
                               />
                             )}
+
                             <div className="top-slide-overlay">
                               <h3>{title}</h3>
                             </div>
@@ -163,7 +173,7 @@ function TopNews({
                   type="button"
                   className="slider-btn next"
                   onClick={goToNext}
-                  aria-label="Next slide"
+                  aria-label={t.next}
                 >
                   ›
                 </button>
