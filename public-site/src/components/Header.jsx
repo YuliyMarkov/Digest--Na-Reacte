@@ -20,6 +20,8 @@ function Header() {
 
   const burgerBtnRef = useRef(null)
   const navRef = useRef(null)
+  const searchToggleRef = useRef(null)
+  const desktopSearchRef = useRef(null)
 
   const uiText = {
     ru: {
@@ -92,6 +94,28 @@ function Header() {
       document.removeEventListener('touchstart', handleClickOutside)
     }
   }, [isMenuOpen])
+
+  useEffect(() => {
+    const handleSearchOutside = (event) => {
+      if (!isSearchOpen) return
+      if (window.innerWidth <= 700) return
+
+      const clickedSearchWrap = desktopSearchRef.current?.contains(event.target)
+      const clickedSearchToggle = searchToggleRef.current?.contains(event.target)
+
+      if (!clickedSearchWrap && !clickedSearchToggle) {
+        setIsSearchOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleSearchOutside)
+    document.addEventListener('touchstart', handleSearchOutside)
+
+    return () => {
+      document.removeEventListener('mousedown', handleSearchOutside)
+      document.removeEventListener('touchstart', handleSearchOutside)
+    }
+  }, [isSearchOpen])
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev)
@@ -245,6 +269,7 @@ function Header() {
 
         <div className="header-actions">
           <button
+            ref={searchToggleRef}
             className={`search-toggle ${isSearchOpen ? 'active' : ''}`}
             id="searchToggle"
             type="button"
@@ -351,6 +376,7 @@ function Header() {
       </div>
 
       <div
+        ref={desktopSearchRef}
         className={`desktop-search-wrap ${isSearchOpen ? 'active' : ''}`}
         id="desktopSearchBar"
       >

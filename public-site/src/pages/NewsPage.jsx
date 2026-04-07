@@ -26,13 +26,105 @@ function getCategoryName(category, language) {
   return language === "uz" ? category.nameUz : category.nameRu;
 }
 
-function splitContentToParagraphs(content) {
-  if (!content || typeof content !== "string") return [];
+function stripHtml(html) {
+  if (!html || typeof html !== "string") return "";
 
-  return content
-    .split(/\n+/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractSearchQuery(title) {
+  if (!title || typeof title !== "string") return "";
+
+  const stopWordsRu = new Set([
+    "и",
+    "в",
+    "во",
+    "на",
+    "с",
+    "со",
+    "по",
+    "за",
+    "от",
+    "до",
+    "из",
+    "у",
+    "о",
+    "об",
+    "под",
+    "при",
+    "к",
+    "ко",
+    "не",
+    "но",
+    "что",
+    "как",
+    "это",
+    "уже",
+    "ещё",
+    "еще",
+    "для",
+    "или",
+    "а",
+    "то",
+    "же",
+    "ли",
+    "бы",
+  ]);
+
+  const stopWordsUz = new Set([
+    "va",
+    "ham",
+    "bilan",
+    "uchun",
+    "bu",
+    "shu",
+    "o‘sha",
+    "osha",
+    "bir",
+    "ikki",
+    "uch",
+    "da",
+    "de",
+    "dan",
+    "ga",
+    "ka",
+    "ni",
+    "mi",
+    "yo",
+    "yoki",
+    "lekin",
+    "ammo",
+  ]);
+
+  const words = title
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s-]/gu, " ")
+    .split(/\s+/)
+    .map((word) => word.trim())
+    .filter(Boolean)
+    .filter((word) => word.length > 2)
+    .filter((word) => !stopWordsRu.has(word) && !stopWordsUz.has(word));
+
+  return [...new Set(words)].slice(0, 4).join(" ");
+}
+
+function mergeUniqueArticles(...groups) {
+  const map = new Map();
+
+  groups.flat().forEach((item) => {
+    if (!item?.id) return;
+    if (!map.has(item.id)) {
+      map.set(item.id, item);
+    }
+  });
+
+  return Array.from(map.values());
 }
 
 function NewsPage() {
@@ -55,7 +147,7 @@ function NewsPage() {
       backHome: "Вернуться на главную",
       home: "Главная",
       latest: "Последние новости",
-      allNews: "Все новости",
+      related: "Похожие новости",
       showMore: "Смотреть ещё",
       reactionsTitle: "Как вам новость?",
       share: "Поделиться новостью",
@@ -74,7 +166,7 @@ function NewsPage() {
       backHome: "Bosh sahifaga qaytish",
       home: "Bosh sahifa",
       latest: "So‘nggi yangiliklar",
-      allNews: "Barcha yangiliklar",
+      related: "O‘xshash yangiliklar",
       showMore: "Yana ko‘rish",
       reactionsTitle: "Yangilik sizga qanday?",
       share: "Yangilikni ulashish",
@@ -165,14 +257,12 @@ function NewsPage() {
 
         if (isMounted) {
           setLatestArticles(filtered.slice(0, 8));
-          setMoreArticles(filtered.slice(0, 6));
         }
       } catch (err) {
         console.error("Failed to load sidebar articles:", err);
 
         if (isMounted) {
           setLatestArticles([]);
-          setMoreArticles([]);
         }
       } finally {
         if (isMounted) {
@@ -187,6 +277,96 @@ function NewsPage() {
       isMounted = false;
     };
   }, [slug, language]);
+
+  useEffect(() => {
+    if (!article?.id) return;
+
+    let isMounted = true;
+
+    async function loadRelatedArticles() {
+      try {
+        const currentTitle = article?.translation?.title || "";
+        const currentCategorySlug = article?.category?.slug || "";
+        const searchQuery = extractSearchQuery(currentTitle);
+
+        let searchResults = [];
+        let categoryResults = [];
+        let latestResults = [];
+
+        if (searchQuery) {
+          const response = await fetch(
+            `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(
+              language
+            )}&search=${encodeURIComponent(searchQuery)}`
+          );
+
+          const data = await response.json();
+
+          if (response.ok && data.ok) {
+            searchResults = data.articles || [];
+          }
+        }
+
+        if (currentCategorySlug) {
+          const response = await fetch(
+            `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(
+              language
+            )}&category=${encodeURIComponent(currentCategorySlug)}`
+          );
+
+          const data = await response.json();
+
+          if (response.ok && data.ok) {
+            categoryResults = data.articles || [];
+          }
+        }
+
+        if (searchResults.length < 6 || categoryResults.length < 6) {
+          const response = await fetch(
+            `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`
+          );
+
+          const data = await response.json();
+
+          if (response.ok && data.ok) {
+            latestResults = data.articles || [];
+          }
+        }
+
+        const filteredSearch = searchResults.filter(
+          (item) => item.slug !== slug && item.category?.slug === currentCategorySlug
+        );
+
+        const filteredCategory = categoryResults.filter(
+          (item) => item.slug !== slug
+        );
+
+        const filteredLatest = latestResults.filter((item) => item.slug !== slug);
+
+        const merged = mergeUniqueArticles(
+          filteredSearch,
+          filteredCategory,
+          filteredLatest
+        ).slice(0, 6);
+
+        if (isMounted) {
+          setMoreArticles(merged);
+        }
+      } catch (err) {
+        console.error("Failed to load related articles:", err);
+
+        if (isMounted) {
+          setMoreArticles([]);
+        }
+      }
+    }
+
+    loadRelatedArticles();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [article, slug, language]);
 
   useEffect(() => {
     if (!article?.id) return;
@@ -206,10 +386,11 @@ function NewsPage() {
   const localizedSeoTitle = article?.translation?.seoTitle?.trim() || "";
   const localizedSeoDescription =
     article?.translation?.seoDescription?.trim() || "";
+  const localizedContentHtml = article?.translation?.content || "";
 
-  const localizedContent = useMemo(() => {
-    return splitContentToParagraphs(article?.translation?.content);
-  }, [article?.translation?.content]);
+  const plainTextContent = useMemo(() => {
+    return stripHtml(localizedContentHtml);
+  }, [localizedContentHtml]);
 
   const categorySlug = article?.category?.slug || "uzbekistan";
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
@@ -228,11 +409,7 @@ function NewsPage() {
   };
 
   const descriptionFromContent =
-    localizedExcerpt ||
-    localizedContent.find(
-      (paragraph) => typeof paragraph === "string" && paragraph.trim().length > 0
-    ) ||
-    t.fallbackDescription;
+    localizedExcerpt || plainTextContent || t.fallbackDescription;
 
   const seoDescriptionSource =
     localizedSeoDescription || descriptionFromContent || t.fallbackDescription;
@@ -418,12 +595,12 @@ function NewsPage() {
               <img src={article.coverImage} alt={seoTitle || localizedTitle} />
             )}
 
-            {localizedContent.map((paragraph, index) => (
-              <div key={index}>
-                <p>{paragraph}</p>
-                {index === 1 && <AdBlock className="article-inline-ad" />}
-              </div>
-            ))}
+            <div
+              className="article-content rich-text-content"
+              dangerouslySetInnerHTML={{ __html: localizedContentHtml }}
+            />
+
+            <AdBlock className="article-inline-ad" />
 
             <div className="article-extra">
               <section className="article-reactions" aria-label="Реакции">
@@ -579,9 +756,9 @@ function NewsPage() {
 
       <section className="more-news-section">
         <div className="news-feed-header">
-          <h2>{t.allNews}</h2>
+          <h2>{t.related}</h2>
 
-          <Link to={`/${language}`} className="news-more">
+          <Link to={`/${language}/category/${categorySlug}`} className="news-more">
             {t.showMore} <span className="arrow">→</span>
           </Link>
         </div>

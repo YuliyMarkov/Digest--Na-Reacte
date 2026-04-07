@@ -1,121 +1,122 @@
-import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import RichTextEditor from "../components/RichTextEditor";
 
-const API_BASE_URL = 'http://192.168.1.31:4000'
+const API_BASE_URL = "http://192.168.1.31:4000";
 
-function generateSlug(text = '') {
+function generateSlug(text = "") {
   return text
     .toLowerCase()
-    .replace(/а/g, 'a')
-    .replace(/б/g, 'b')
-    .replace(/в/g, 'v')
-    .replace(/г/g, 'g')
-    .replace(/д/g, 'd')
-    .replace(/е/g, 'e')
-    .replace(/ё/g, 'e')
-    .replace(/ж/g, 'zh')
-    .replace(/з/g, 'z')
-    .replace(/и/g, 'i')
-    .replace(/й/g, 'y')
-    .replace(/к/g, 'k')
-    .replace(/л/g, 'l')
-    .replace(/м/g, 'm')
-    .replace(/н/g, 'n')
-    .replace(/о/g, 'o')
-    .replace(/п/g, 'p')
-    .replace(/р/g, 'r')
-    .replace(/с/g, 's')
-    .replace(/т/g, 't')
-    .replace(/у/g, 'u')
-    .replace(/ф/g, 'f')
-    .replace(/х/g, 'h')
-    .replace(/ц/g, 'ts')
-    .replace(/ч/g, 'ch')
-    .replace(/ш/g, 'sh')
-    .replace(/щ/g, 'sch')
-    .replace(/ы/g, 'y')
-    .replace(/э/g, 'e')
-    .replace(/ю/g, 'yu')
-    .replace(/я/g, 'ya')
-    .replace(/ъ|ь/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
+    .replace(/а/g, "a")
+    .replace(/б/g, "b")
+    .replace(/в/g, "v")
+    .replace(/г/g, "g")
+    .replace(/д/g, "d")
+    .replace(/е/g, "e")
+    .replace(/ё/g, "e")
+    .replace(/ж/g, "zh")
+    .replace(/з/g, "z")
+    .replace(/и/g, "i")
+    .replace(/й/g, "y")
+    .replace(/к/g, "k")
+    .replace(/л/g, "l")
+    .replace(/м/g, "m")
+    .replace(/н/g, "n")
+    .replace(/о/g, "o")
+    .replace(/п/g, "p")
+    .replace(/р/g, "r")
+    .replace(/с/g, "s")
+    .replace(/т/g, "t")
+    .replace(/у/g, "u")
+    .replace(/ф/g, "f")
+    .replace(/х/g, "h")
+    .replace(/ц/g, "ts")
+    .replace(/ч/g, "ch")
+    .replace(/ш/g, "sh")
+    .replace(/щ/g, "sch")
+    .replace(/ы/g, "y")
+    .replace(/э/g, "e")
+    .replace(/ю/g, "yu")
+    .replace(/я/g, "ya")
+    .replace(/ъ|ь/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 function AdminCreateArticlePage() {
-  const navigate = useNavigate()
-  const token = localStorage.getItem('admin_token')
+  const navigate = useNavigate();
+  const token = localStorage.getItem("admin_token");
 
-  const [categories, setCategories] = useState([])
-  const [loadingCategories, setLoadingCategories] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState('')
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  const [slug, setSlug] = useState('')
-  const [isSlugEdited, setIsSlugEdited] = useState(false)
-  const [categoryIds, setCategoryIds] = useState([])
-  const [coverImage, setCoverImage] = useState('')
-  const [isFeatured, setIsFeatured] = useState(false)
+  const [slug, setSlug] = useState("");
+  const [isSlugEdited, setIsSlugEdited] = useState(false);
+  const [categoryIds, setCategoryIds] = useState([]);
+  const [coverImage, setCoverImage] = useState("");
+  const [isFeatured, setIsFeatured] = useState(false);
 
-  const [ruTitle, setRuTitle] = useState('')
-  const [ruExcerpt, setRuExcerpt] = useState('')
-  const [ruContent, setRuContent] = useState('')
-  const [ruSeoTitle, setRuSeoTitle] = useState('')
-  const [ruSeoDescription, setRuSeoDescription] = useState('')
+  const [ruTitle, setRuTitle] = useState("");
+  const [ruExcerpt, setRuExcerpt] = useState("");
+  const [ruContent, setRuContent] = useState("");
+  const [ruSeoTitle, setRuSeoTitle] = useState("");
+  const [ruSeoDescription, setRuSeoDescription] = useState("");
 
-  const [uzTitle, setUzTitle] = useState('')
-  const [uzExcerpt, setUzExcerpt] = useState('')
-  const [uzContent, setUzContent] = useState('')
-  const [uzSeoTitle, setUzSeoTitle] = useState('')
-  const [uzSeoDescription, setUzSeoDescription] = useState('')
+  const [uzTitle, setUzTitle] = useState("");
+  const [uzExcerpt, setUzExcerpt] = useState("");
+  const [uzContent, setUzContent] = useState("");
+  const [uzSeoTitle, setUzSeoTitle] = useState("");
+  const [uzSeoDescription, setUzSeoDescription] = useState("");
 
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        setLoadingCategories(true)
+        setLoadingCategories(true);
 
-        const res = await fetch(`${API_BASE_URL}/api/categories`)
-        const data = await res.json()
+        const res = await fetch(`${API_BASE_URL}/api/categories`);
+        const data = await res.json();
 
         if (!res.ok || !data.ok) {
-          throw new Error('Не удалось загрузить категории')
+          throw new Error("Не удалось загрузить категории");
         }
 
-        setCategories(data.categories || [])
+        setCategories(data.categories || []);
       } catch (err) {
-        console.error(err)
-        setError('Не удалось загрузить категории')
+        console.error(err);
+        setError("Не удалось загрузить категории");
       } finally {
-        setLoadingCategories(false)
+        setLoadingCategories(false);
       }
-    }
+    };
 
-    loadCategories()
-  }, [])
+    loadCategories();
+  }, []);
 
   useEffect(() => {
     if (!isSlugEdited) {
-      setSlug(generateSlug(ruTitle))
+      setSlug(generateSlug(ruTitle));
     }
-  }, [ruTitle, isSlugEdited])
+  }, [ruTitle, isSlugEdited]);
 
   const handleCategoryToggle = (categoryId) => {
     setCategoryIds((prev) =>
       prev.includes(categoryId)
         ? prev.filter((id) => id !== categoryId)
         : [...prev, categoryId]
-    )
-  }
+    );
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
-      setSubmitting(true)
-      setError('')
+      setSubmitting(true);
+      setError("");
 
       if (!categoryIds.length) {
-        throw new Error('Выберите хотя бы одну категорию')
+        throw new Error("Выберите хотя бы одну категорию");
       }
 
       const payload = {
@@ -140,33 +141,33 @@ function AdminCreateArticlePage() {
                 seoDescription: uzSeoDescription,
               }
             : undefined,
-      }
+      };
 
       const res = await fetch(`${API_BASE_URL}/api/articles`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (!res.ok || !data.ok) {
-        throw new Error(data.message || 'Не удалось создать новость')
+        throw new Error(data.message || "Не удалось создать новость");
       }
 
-      navigate('/dashboard')
+      navigate("/dashboard");
     } catch (err) {
-      console.error(err)
-      setError(err.message || 'Не удалось создать новость')
+      console.error(err);
+      setError(err.message || "Не удалось создать новость");
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
-  const normalizedPreviewUrl = coverImage.trim()
+  const normalizedPreviewUrl = coverImage.trim();
 
   return (
     <main className="admin-dashboard-page">
@@ -192,8 +193,8 @@ function AdminCreateArticlePage() {
                 type="text"
                 value={slug}
                 onChange={(e) => {
-                  setSlug(e.target.value)
-                  setIsSlugEdited(true)
+                  setSlug(e.target.value);
+                  setIsSlugEdited(true);
                 }}
                 placeholder="weather-weekend-uzbekistan"
                 required
@@ -238,7 +239,7 @@ function AdminCreateArticlePage() {
                     alt="Предпросмотр"
                     loading="lazy"
                     onError={(e) => {
-                      e.currentTarget.style.display = 'none'
+                      e.currentTarget.style.display = "none";
                     }}
                   />
                 </div>
@@ -277,15 +278,14 @@ function AdminCreateArticlePage() {
               />
             </label>
 
-            <label>
+            <div className="admin-form-field">
               <span>Текст новости</span>
-              <textarea
+              <RichTextEditor
                 value={ruContent}
-                onChange={(e) => setRuContent(e.target.value)}
-                rows={10}
-                required
+                onChange={setRuContent}
+                placeholder="Введите текст русской версии..."
               />
-            </label>
+            </div>
 
             <label>
               <span>SEO title</span>
@@ -329,14 +329,14 @@ function AdminCreateArticlePage() {
               />
             </label>
 
-            <label>
+            <div className="admin-form-field">
               <span>Текст новости</span>
-              <textarea
+              <RichTextEditor
                 value={uzContent}
-                onChange={(e) => setUzContent(e.target.value)}
-                rows={10}
+                onChange={setUzContent}
+                placeholder="Matnni kiriting..."
               />
-            </label>
+            </div>
 
             <label>
               <span>SEO title</span>
@@ -363,13 +363,13 @@ function AdminCreateArticlePage() {
 
           <div className="admin-form-actions">
             <button type="submit" disabled={submitting}>
-              {submitting ? 'Сохраняем...' : 'Создать новость'}
+              {submitting ? "Сохраняем..." : "Создать новость"}
             </button>
           </div>
         </form>
       </div>
     </main>
-  )
+  );
 }
 
-export default AdminCreateArticlePage
+export default AdminCreateArticlePage;

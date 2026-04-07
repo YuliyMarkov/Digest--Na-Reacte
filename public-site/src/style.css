@@ -3439,3 +3439,37 @@ body.dark-theme .not-found-img.dark {
     justify-content: flex-start;
   }
 }
+
+.article-content.rich-text-content {
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+.article-content.rich-text-content p {
+  margin: 0 0 1em;
+}
+
+.article-content.rich-text-content ul,
+.article-content.rich-text-content ol {
+  margin: 0 0 1em;
+  padding-left: 22px;
+}
+
+.article-content.rich-text-content li {
+  margin-bottom: 0.5em;
+}
+
+.article-content.rich-text-content a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-word;
+}
+
+.article-content.rich-text-content strong {
+  font-weight: 700;
+}
+
+.article-content.rich-text-content em {
+  font-style: italic;
+}
