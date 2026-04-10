@@ -274,6 +274,7 @@ router.post("/articles", requireAuth, async (req, res) => {
               content: ru.content,
               seoTitle: ru.seoTitle || null,
               seoDescription: ru.seoDescription || null,
+              telegramEmbedUrl: ru.telegramEmbedUrl || null,
             },
             ...(uz && uz.title && uz.content
               ? [
@@ -284,6 +285,7 @@ router.post("/articles", requireAuth, async (req, res) => {
                     content: uz.content,
                     seoTitle: uz.seoTitle || null,
                     seoDescription: uz.seoDescription || null,
+                    telegramEmbedUrl: uz.telegramEmbedUrl || null,
                   },
                 ]
               : []),
@@ -484,6 +486,7 @@ router.put("/articles/:id", requireAuth, async (req, res) => {
           content: ru.content,
           seoTitle: ru.seoTitle || null,
           seoDescription: ru.seoDescription || null,
+          telegramEmbedUrl: ru.telegramEmbedUrl || null,
         },
       });
     } else {
@@ -496,11 +499,12 @@ router.put("/articles/:id", requireAuth, async (req, res) => {
           content: ru.content,
           seoTitle: ru.seoTitle || null,
           seoDescription: ru.seoDescription || null,
+          telegramEmbedUrl: ru.telegramEmbedUrl || null,
         },
       });
     }
 
-    if (uz && (uz.title || uz.content || uz.excerpt)) {
+    if (uz && (uz.title || uz.content || uz.excerpt || uz.telegramEmbedUrl)) {
       const uzTranslation = existingArticle.translations.find(
         (item) => item.locale === "uz"
       );
@@ -514,6 +518,7 @@ router.put("/articles/:id", requireAuth, async (req, res) => {
             content: uz.content || "",
             seoTitle: uz.seoTitle || null,
             seoDescription: uz.seoDescription || null,
+            telegramEmbedUrl: uz.telegramEmbedUrl || null,
           },
         });
       } else if (uz.title && uz.content) {
@@ -526,6 +531,7 @@ router.put("/articles/:id", requireAuth, async (req, res) => {
             content: uz.content,
             seoTitle: uz.seoTitle || null,
             seoDescription: uz.seoDescription || null,
+            telegramEmbedUrl: uz.telegramEmbedUrl || null,
           },
         });
       }

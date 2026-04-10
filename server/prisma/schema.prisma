@@ -72,17 +72,18 @@ model Article {
 }
 
 model ArticleTranslation {
-  id             Int       @id @default(autoincrement())
-  articleId      Int
-  locale         Locale
-  title          String
-  excerpt        String?
-  content        String
-  seoTitle       String?
-  seoDescription String?
-  article        Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id               Int      @id @default(autoincrement())
+  articleId        Int
+  locale           Locale
+  title            String
+  excerpt          String?
+  content          String
+  coverImage       String?
+  telegramEmbedUrl String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
   @@unique([articleId, locale])
 }

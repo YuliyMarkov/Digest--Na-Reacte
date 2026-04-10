@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import RichTextEditor from "../components/RichTextEditor";
 
-const API_BASE_URL = "http://192.168.1.31:4000";
+const API_BASE_URL = "http://localhost:4000";
 
 function generateSlug(text = "") {
   return text
@@ -63,12 +63,14 @@ function AdminCreateArticlePage() {
   const [ruContent, setRuContent] = useState("");
   const [ruSeoTitle, setRuSeoTitle] = useState("");
   const [ruSeoDescription, setRuSeoDescription] = useState("");
+  const [ruTelegramEmbedUrl, setRuTelegramEmbedUrl] = useState("");
 
   const [uzTitle, setUzTitle] = useState("");
   const [uzExcerpt, setUzExcerpt] = useState("");
   const [uzContent, setUzContent] = useState("");
   const [uzSeoTitle, setUzSeoTitle] = useState("");
   const [uzSeoDescription, setUzSeoDescription] = useState("");
+  const [uzTelegramEmbedUrl, setUzTelegramEmbedUrl] = useState("");
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -130,6 +132,7 @@ function AdminCreateArticlePage() {
           content: ruContent,
           seoTitle: ruSeoTitle,
           seoDescription: ruSeoDescription,
+          telegramEmbedUrl: ruTelegramEmbedUrl.trim() || null,
         },
         uz:
           uzTitle && uzContent
@@ -139,6 +142,7 @@ function AdminCreateArticlePage() {
                 content: uzContent,
                 seoTitle: uzSeoTitle,
                 seoDescription: uzSeoDescription,
+                telegramEmbedUrl: uzTelegramEmbedUrl.trim() || null,
               }
             : undefined,
       };
@@ -288,6 +292,16 @@ function AdminCreateArticlePage() {
             </div>
 
             <label>
+              <span>Telegram embed URL</span>
+              <input
+                type="text"
+                value={ruTelegramEmbedUrl}
+                onChange={(e) => setRuTelegramEmbedUrl(e.target.value)}
+                placeholder="https://t.me/username/123?embed=1"
+              />
+            </label>
+
+            <label>
               <span>SEO title</span>
               <input
                 type="text"
@@ -337,6 +351,16 @@ function AdminCreateArticlePage() {
                 placeholder="Matnni kiriting..."
               />
             </div>
+
+            <label>
+              <span>Telegram embed URL</span>
+              <input
+                type="text"
+                value={uzTelegramEmbedUrl}
+                onChange={(e) => setUzTelegramEmbedUrl(e.target.value)}
+                placeholder="https://t.me/username/123?embed=1"
+              />
+            </label>
 
             <label>
               <span>SEO title</span>

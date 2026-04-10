@@ -7,7 +7,7 @@ import AdBlock from "../components/AdBlock";
 import { useLanguage } from "../context/useLanguage";
 import Seo from "../components/Seo";
 
-const API_BASE_URL = "http://192.168.1.31:4000";
+const API_BASE_URL = "http://localhost:4000";
 
 function HomePage({ onOpenReel }) {
   const { language } = useLanguage();

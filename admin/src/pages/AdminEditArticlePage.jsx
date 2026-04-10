@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import RichTextEditor from "../components/RichTextEditor";
 
-const API_BASE_URL = "http://192.168.1.31:4000";
+const API_BASE_URL = "http://localhost:4000";
 
 function generateSlug(text = "") {
   return text
@@ -65,12 +65,14 @@ function AdminEditArticlePage() {
   const [ruContent, setRuContent] = useState("");
   const [ruSeoTitle, setRuSeoTitle] = useState("");
   const [ruSeoDescription, setRuSeoDescription] = useState("");
+  const [ruTelegramEmbedUrl, setRuTelegramEmbedUrl] = useState("");
 
   const [uzTitle, setUzTitle] = useState("");
   const [uzExcerpt, setUzExcerpt] = useState("");
   const [uzContent, setUzContent] = useState("");
   const [uzSeoTitle, setUzSeoTitle] = useState("");
   const [uzSeoDescription, setUzSeoDescription] = useState("");
+  const [uzTelegramEmbedUrl, setUzTelegramEmbedUrl] = useState("");
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -127,8 +129,8 @@ function AdminEditArticlePage() {
           Array.isArray(article.categoryIds)
             ? article.categoryIds.map(Number).filter(Boolean)
             : article.category?.id
-            ? [Number(article.category.id)]
-            : []
+              ? [Number(article.category.id)]
+              : []
         );
         setCoverImage(article.coverImage || "");
         setIsFeatured(!!article.isFeatured);
@@ -144,6 +146,9 @@ function AdminEditArticlePage() {
           setRuContent(ruData.article.translation?.content || "");
           setRuSeoTitle(ruData.article.translation?.seoTitle || "");
           setRuSeoDescription(ruData.article.translation?.seoDescription || "");
+          setRuTelegramEmbedUrl(
+            ruData.article.translation?.telegramEmbedUrl || ""
+          );
         }
 
         const uzRes = await fetch(
@@ -157,6 +162,9 @@ function AdminEditArticlePage() {
           setUzContent(uzData.article.translation?.content || "");
           setUzSeoTitle(uzData.article.translation?.seoTitle || "");
           setUzSeoDescription(uzData.article.translation?.seoDescription || "");
+          setUzTelegramEmbedUrl(
+            uzData.article.translation?.telegramEmbedUrl || ""
+          );
         }
       } catch (err) {
         console.error(err);
@@ -205,6 +213,7 @@ function AdminEditArticlePage() {
           content: ruContent,
           seoTitle: ruSeoTitle,
           seoDescription: ruSeoDescription,
+          telegramEmbedUrl: ruTelegramEmbedUrl.trim() || null,
         },
         uz:
           uzTitle && uzContent
@@ -214,6 +223,7 @@ function AdminEditArticlePage() {
                 content: uzContent,
                 seoTitle: uzSeoTitle,
                 seoDescription: uzSeoDescription,
+                telegramEmbedUrl: uzTelegramEmbedUrl.trim() || null,
               }
             : undefined,
       };
@@ -372,6 +382,16 @@ function AdminEditArticlePage() {
             </div>
 
             <label>
+              <span>Telegram embed URL</span>
+              <input
+                type="text"
+                value={ruTelegramEmbedUrl}
+                onChange={(e) => setRuTelegramEmbedUrl(e.target.value)}
+                placeholder="https://t.me/username/123?embed=1"
+              />
+            </label>
+
+            <label>
               <span>SEO title</span>
               <input
                 type="text"
@@ -421,6 +441,16 @@ function AdminEditArticlePage() {
                 placeholder="Matnni kiriting..."
               />
             </div>
+
+            <label>
+              <span>Telegram embed URL</span>
+              <input
+                type="text"
+                value={uzTelegramEmbedUrl}
+                onChange={(e) => setUzTelegramEmbedUrl(e.target.value)}
+                placeholder="https://t.me/username/123?embed=1"
+              />
+            </label>
 
             <label>
               <span>SEO title</span>
