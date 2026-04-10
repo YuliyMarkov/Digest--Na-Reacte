@@ -43,8 +43,8 @@ function PrivacyPage() {
                 <p>
                   Настоящая Политика конфиденциальности определяет порядок обработки и защиты информации
                   о пользователях сайта{" "}
-                  <a href="https://digestnews.uz" target="_blank" rel="noopener noreferrer">
-                    https://digestnews.uz
+                  <a href="https://digest-news.uz" target="_blank" rel="noopener noreferrer">
+                    https://digest-news.uz
                   </a>.
                 </p>
 
@@ -119,7 +119,7 @@ function PrivacyPage() {
 
                 <h2>11. Контакты</h2>
                 <p>
-                  Email: <a href="mailto:info@digestnews.uz">info@digestnews.uz</a>
+                  Email: <a href="mailto:info@digest-news.uz">info@digest-news.uz</a>
                 </p>
                 <p>
                   Telegram:{" "}
@@ -135,8 +135,8 @@ function PrivacyPage() {
               <>
                 <p>
                   Ushbu Maxfiylik siyosati{" "}
-                  <a href="https://digestnews.uz" target="_blank" rel="noopener noreferrer">
-                    https://digestnews.uz
+                  <a href="https://digest-news.uz" target="_blank" rel="noopener noreferrer">
+                    https://digest-news.uz
                   </a>{" "}
                   sayt foydalanuvchilari haqidagi ma’lumotlarni qayta ishlash va himoya qilish tartibini belgilaydi.
                 </p>
@@ -203,7 +203,7 @@ function PrivacyPage() {
 
                 <h2>11. Aloqa</h2>
                 <p>
-                  Email: <a href="mailto:info@digestnews.uz">info@digestnews.uz</a>
+                  Email: <a href="mailto:info@digest-news.uz">info@digest-news.uz</a>
                 </p>
                 <p>
                   Telegram:{" "}

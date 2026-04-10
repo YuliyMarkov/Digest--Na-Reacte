@@ -5,70 +5,70 @@
 
   <!-- Главная -->
   <url>
-    <loc>https://digestnews.uz/ru</loc>
+    <loc>https://digest-news.uz/ru</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/uz</loc>
+    <loc>https://digest-news.uz/uz</loc>
   </url>
 
   <!-- Категории -->
   <url>
-    <loc>https://digestnews.uz/ru/category/uzbekistan</loc>
+    <loc>https://digest-news.uz/ru/category/uzbekistan</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/ru/category/world</loc>
+    <loc>https://digest-news.uz/ru/category/world</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/ru/category/auto</loc>
+    <loc>https://digest-news.uz/ru/category/auto</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/ru/category/incidents</loc>
+    <loc>https://digest-news.uz/ru/category/incidents</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/ru/category/science</loc>
+    <loc>https://digest-news.uz/ru/category/science</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/ru/category/economy</loc>
+    <loc>https://digest-news.uz/ru/category/economy</loc>
   </url>
 
   <url>
-    <loc>https://digestnews.uz/uz/category/uzbekistan</loc>
+    <loc>https://digest-news.uz/uz/category/uzbekistan</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/uz/category/world</loc>
+    <loc>https://digest-news.uz/uz/category/world</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/uz/category/auto</loc>
+    <loc>https://digest-news.uz/uz/category/auto</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/uz/category/incidents</loc>
+    <loc>https://digest-news.uz/uz/category/incidents</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/uz/category/science</loc>
+    <loc>https://digest-news.uz/uz/category/science</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/uz/category/economy</loc>
+    <loc>https://digest-news.uz/uz/category/economy</loc>
   </url>
 
   <!-- Статические страницы -->
   <url>
-    <loc>https://digestnews.uz/ru/about</loc>
+    <loc>https://digest-news.uz/ru/about</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/ru/contacts</loc>
+    <loc>https://digest-news.uz/ru/contacts</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/ru/privacy</loc>
+    <loc>https://digest-news.uz/ru/privacy</loc>
   </url>
 
   <url>
-    <loc>https://digestnews.uz/uz/about</loc>
+    <loc>https://digest-news.uz/uz/about</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/uz/contacts</loc>
+    <loc>https://digest-news.uz/uz/contacts</loc>
   </url>
   <url>
-    <loc>https://digestnews.uz/uz/privacy</loc>
+    <loc>https://digest-news.uz/uz/privacy</loc>
   </url>
 
 </urlset>

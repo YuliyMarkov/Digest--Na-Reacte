@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const API_BASE_URL = ''
+const API_BASE_URL = 'http://localhost:4000'
 
 function AdminLoginPage() {
   const navigate = useNavigate()

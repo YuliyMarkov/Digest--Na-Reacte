@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://digestnews.uz/sitemap.xml
+Sitemap: https://digest-news.uz/sitemap.xml

@@ -15,8 +15,8 @@ function ContactsPage() {
           items: [
             {
               label: "Email",
-              text: "info@digestnews.uz",
-              href: "mailto:info@digestnews.uz",
+              text: "info@digest-news.uz",
+              href: "mailto:info@digest-news.uz",
             },
           ],
         },
@@ -73,8 +73,8 @@ function ContactsPage() {
           items: [
             {
               label: "Email",
-              text: "info@digestnews.uz",
-              href: "mailto:info@digestnews.uz",
+              text: "info@digest-news.uz",
+              href: "mailto:info@digest-news.uz",
             },
           ],
         },

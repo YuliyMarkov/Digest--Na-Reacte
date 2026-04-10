@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useLanguage } from "../context/useLanguage";
 import AdBlock from "../components/AdBlock";
@@ -125,6 +125,77 @@ function mergeUniqueArticles(...groups) {
   });
 
   return Array.from(map.values());
+}
+
+function parseTelegramEmbedUrl(url) {
+  if (!url || typeof url !== "string") return null;
+
+  try {
+    const normalizedUrl = url.trim();
+    if (!normalizedUrl) return null;
+
+    const parsed = new URL(normalizedUrl);
+    const host = parsed.hostname.replace(/^www\./, "");
+
+    if (host !== "t.me" && host !== "telegram.me") {
+      return null;
+    }
+
+    const parts = parsed.pathname.split("/").filter(Boolean);
+
+    if (parts.length < 2) return null;
+
+    const channel = parts[0];
+    const postId = parts[1];
+
+    if (!channel || !postId || !/^\d+$/.test(postId)) {
+      return null;
+    }
+
+    return {
+      channel,
+      postId,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function TelegramPostEmbed({ url }) {
+  const embedData = useMemo(() => parseTelegramEmbedUrl(url), [url]);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!embedData || !containerRef.current) return;
+
+    containerRef.current.innerHTML = "";
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://telegram.org/js/telegram-widget.js?22";
+    script.setAttribute(
+      "data-telegram-post",
+      `${embedData.channel}/${embedData.postId}`
+    );
+    script.setAttribute("data-width", "100%");
+    script.setAttribute("data-userpic", "true");
+
+    containerRef.current.appendChild(script);
+
+    return () => {
+      if (containerRef.current) {
+        containerRef.current.innerHTML = "";
+      }
+    };
+  }, [embedData]);
+
+  if (!embedData) return null;
+
+  return (
+    <section className="article-telegram-embed-section">
+      <div className="article-telegram-embed" ref={containerRef} />
+    </section>
+  );
 }
 
 function NewsPage() {
@@ -334,7 +405,8 @@ function NewsPage() {
         }
 
         const filteredSearch = searchResults.filter(
-          (item) => item.slug !== slug && item.category?.slug === currentCategorySlug
+          (item) =>
+            item.slug !== slug && item.category?.slug === currentCategorySlug
         );
 
         const filteredCategory = categoryResults.filter(
@@ -387,6 +459,7 @@ function NewsPage() {
   const localizedSeoDescription =
     article?.translation?.seoDescription?.trim() || "";
   const localizedContentHtml = article?.translation?.content || "";
+  const telegramEmbedUrl = article?.translation?.telegramEmbedUrl || "";
 
   const plainTextContent = useMemo(() => {
     return stripHtml(localizedContentHtml);
@@ -435,7 +508,7 @@ function NewsPage() {
           ? [
               article.coverImage.startsWith("http")
                 ? article.coverImage
-                : `https://digestnews.uz${article.coverImage}`,
+                : `https://digest-news.uz${article.coverImage}`,
             ]
           : [],
         author: {
@@ -447,7 +520,7 @@ function NewsPage() {
           name: "Дайджест",
           logo: {
             "@type": "ImageObject",
-            url: "https://digestnews.uz/New_Logo.png",
+            url: "https://digest-news.uz/New_Logo.png",
           },
         },
         mainEntityOfPage: {
@@ -600,6 +673,13 @@ function NewsPage() {
               dangerouslySetInnerHTML={{ __html: localizedContentHtml }}
             />
 
+            {telegramEmbedUrl && (
+              <div className="article-embedded-post-block">
+                <div className="article-extra-title">{t.telegramPostTitle}</div>
+                <TelegramPostEmbed url={telegramEmbedUrl} />
+              </div>
+            )}
+
             <AdBlock className="article-inline-ad" />
 
             <div className="article-extra">
@@ -699,6 +779,7 @@ function NewsPage() {
                   >
                     Threads
                   </a>
+
                 </div>
               </section>
 

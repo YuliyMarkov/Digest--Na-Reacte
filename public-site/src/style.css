@@ -3473,3 +3473,39 @@ body.dark-theme .not-found-img.dark {
 .article-content.rich-text-content em {
   font-style: italic;
 }
+
+.article-telegram-embed-section {
+  width: 100%;
+  margin: 24px 0;
+}
+
+.article-telegram-embed {
+  width: 100%;
+  overflow: hidden;
+}
+
+.article-telegram-embed iframe,
+.article-telegram-embed > div,
+.article-telegram-embed-section iframe,
+.article-telegram-embed-section > div {
+  max-width: 100% !important;
+}
+
+.article-telegram-embed blockquote,
+.telegram-widget-post {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+}
+
+@media (max-width: 768px) {
+  .article-telegram-embed-section {
+    margin: 20px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .article-telegram-embed-section {
+    margin: 16px 0;
+  }
+}

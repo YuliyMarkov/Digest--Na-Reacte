@@ -10,7 +10,7 @@ function Seo({
   locale = "ru_RU",
   preloadImage = "",
 }) {
-  const siteUrl = "https://digestnews.uz";
+  const siteUrl = "https://digest-news.uz";
   const siteName = "Дайджест";
 
   const safeTitle =
