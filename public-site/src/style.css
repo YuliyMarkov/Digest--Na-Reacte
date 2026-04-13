@@ -2015,7 +2015,6 @@ body.dark-theme .article-telegram-subscribe {
 }
 
 .adsense-slot::before {
-  content: "Рекламный блок";
   color: rgba(255, 255, 255, 0.55);
   font-size: 14px;
   font-weight: 600;
