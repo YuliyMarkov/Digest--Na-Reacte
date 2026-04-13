@@ -64,6 +64,7 @@ function AdminCreateArticlePage() {
   const [ruSeoTitle, setRuSeoTitle] = useState("");
   const [ruSeoDescription, setRuSeoDescription] = useState("");
   const [ruTelegramEmbedUrl, setRuTelegramEmbedUrl] = useState("");
+  const [ruYoutubeEmbedUrl, setRuYoutubeEmbedUrl] = useState("");
 
   const [uzTitle, setUzTitle] = useState("");
   const [uzExcerpt, setUzExcerpt] = useState("");
@@ -71,6 +72,7 @@ function AdminCreateArticlePage() {
   const [uzSeoTitle, setUzSeoTitle] = useState("");
   const [uzSeoDescription, setUzSeoDescription] = useState("");
   const [uzTelegramEmbedUrl, setUzTelegramEmbedUrl] = useState("");
+  const [uzYoutubeEmbedUrl, setUzYoutubeEmbedUrl] = useState("");
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -133,6 +135,7 @@ function AdminCreateArticlePage() {
           seoTitle: ruSeoTitle,
           seoDescription: ruSeoDescription,
           telegramEmbedUrl: ruTelegramEmbedUrl.trim() || null,
+          youtubeEmbedUrl: ruYoutubeEmbedUrl.trim() || null,
         },
         uz:
           uzTitle && uzContent
@@ -143,6 +146,7 @@ function AdminCreateArticlePage() {
                 seoTitle: uzSeoTitle,
                 seoDescription: uzSeoDescription,
                 telegramEmbedUrl: uzTelegramEmbedUrl.trim() || null,
+                youtubeEmbedUrl: uzYoutubeEmbedUrl.trim() || null,
               }
             : undefined,
       };
@@ -302,6 +306,16 @@ function AdminCreateArticlePage() {
             </label>
 
             <label>
+              <span>YouTube embed URL</span>
+              <input
+                type="text"
+                value={ruYoutubeEmbedUrl}
+                onChange={(e) => setRuYoutubeEmbedUrl(e.target.value)}
+                placeholder="https://www.youtube.com/embed/VIDEO_ID"
+              />
+            </label>
+
+            <label>
               <span>SEO title</span>
               <input
                 type="text"
@@ -359,6 +373,16 @@ function AdminCreateArticlePage() {
                 value={uzTelegramEmbedUrl}
                 onChange={(e) => setUzTelegramEmbedUrl(e.target.value)}
                 placeholder="https://t.me/username/123?embed=1"
+              />
+            </label>
+
+            <label>
+              <span>YouTube embed URL</span>
+              <input
+                type="text"
+                value={uzYoutubeEmbedUrl}
+                onChange={(e) => setUzYoutubeEmbedUrl(e.target.value)}
+                placeholder="https://www.youtube.com/embed/VIDEO_ID"
               />
             </label>
 

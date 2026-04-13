@@ -66,6 +66,7 @@ function AdminEditArticlePage() {
   const [ruSeoTitle, setRuSeoTitle] = useState("");
   const [ruSeoDescription, setRuSeoDescription] = useState("");
   const [ruTelegramEmbedUrl, setRuTelegramEmbedUrl] = useState("");
+  const [ruYoutubeEmbedUrl, setRuYoutubeEmbedUrl] = useState("");
 
   const [uzTitle, setUzTitle] = useState("");
   const [uzExcerpt, setUzExcerpt] = useState("");
@@ -73,6 +74,7 @@ function AdminEditArticlePage() {
   const [uzSeoTitle, setUzSeoTitle] = useState("");
   const [uzSeoDescription, setUzSeoDescription] = useState("");
   const [uzTelegramEmbedUrl, setUzTelegramEmbedUrl] = useState("");
+  const [uzYoutubeEmbedUrl, setUzYoutubeEmbedUrl] = useState("");
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -149,6 +151,9 @@ function AdminEditArticlePage() {
           setRuTelegramEmbedUrl(
             ruData.article.translation?.telegramEmbedUrl || ""
           );
+          setRuYoutubeEmbedUrl(
+            ruData.article.translation?.youtubeEmbedUrl || ""
+          );
         }
 
         const uzRes = await fetch(
@@ -164,6 +169,9 @@ function AdminEditArticlePage() {
           setUzSeoDescription(uzData.article.translation?.seoDescription || "");
           setUzTelegramEmbedUrl(
             uzData.article.translation?.telegramEmbedUrl || ""
+          );
+          setUzYoutubeEmbedUrl(
+            uzData.article.translation?.youtubeEmbedUrl || ""
           );
         }
       } catch (err) {
@@ -214,6 +222,7 @@ function AdminEditArticlePage() {
           seoTitle: ruSeoTitle,
           seoDescription: ruSeoDescription,
           telegramEmbedUrl: ruTelegramEmbedUrl.trim() || null,
+          youtubeEmbedUrl: ruYoutubeEmbedUrl.trim() || null,
         },
         uz:
           uzTitle && uzContent
@@ -224,6 +233,7 @@ function AdminEditArticlePage() {
                 seoTitle: uzSeoTitle,
                 seoDescription: uzSeoDescription,
                 telegramEmbedUrl: uzTelegramEmbedUrl.trim() || null,
+                youtubeEmbedUrl: uzYoutubeEmbedUrl.trim() || null,
               }
             : undefined,
       };
@@ -392,6 +402,16 @@ function AdminEditArticlePage() {
             </label>
 
             <label>
+              <span>YouTube embed URL</span>
+              <input
+                type="text"
+                value={ruYoutubeEmbedUrl}
+                onChange={(e) => setRuYoutubeEmbedUrl(e.target.value)}
+                placeholder="https://www.youtube.com/embed/VIDEO_ID"
+              />
+            </label>
+
+            <label>
               <span>SEO title</span>
               <input
                 type="text"
@@ -449,6 +469,16 @@ function AdminEditArticlePage() {
                 value={uzTelegramEmbedUrl}
                 onChange={(e) => setUzTelegramEmbedUrl(e.target.value)}
                 placeholder="https://t.me/username/123?embed=1"
+              />
+            </label>
+
+            <label>
+              <span>YouTube embed URL</span>
+              <input
+                type="text"
+                value={uzYoutubeEmbedUrl}
+                onChange={(e) => setUzYoutubeEmbedUrl(e.target.value)}
+                placeholder="https://www.youtube.com/embed/VIDEO_ID"
               />
             </label>
 

@@ -161,6 +161,49 @@ function parseTelegramEmbedUrl(url) {
   }
 }
 
+function parseYoutubeEmbedUrl(url) {
+  if (!url || typeof url !== "string") return null;
+
+  try {
+    const normalizedUrl = url.trim();
+    if (!normalizedUrl) return null;
+
+    const parsed = new URL(normalizedUrl);
+    const host = parsed.hostname.replace(/^www\./, "");
+    let videoId = "";
+
+    if (host === "youtu.be") {
+      videoId = parsed.pathname.split("/").filter(Boolean)[0] || "";
+    } else if (host === "youtube.com" || host === "m.youtube.com") {
+      const parts = parsed.pathname.split("/").filter(Boolean);
+
+      if (parts[0] === "watch") {
+        videoId = parsed.searchParams.get("v") || "";
+      } else if (parts[0] === "shorts" && parts[1]) {
+        videoId = parts[1];
+      } else if (parts[0] === "embed" && parts[1]) {
+        videoId = parts[1];
+      }
+    } else if (host === "youtube-nocookie.com") {
+      const parts = parsed.pathname.split("/").filter(Boolean);
+
+      if (parts[0] === "embed" && parts[1]) {
+        videoId = parts[1];
+      }
+    }
+
+    if (!videoId) return null;
+
+    const cleanVideoId = videoId.replace(/[^a-zA-Z0-9_-]/g, "").trim();
+
+    if (!cleanVideoId) return null;
+
+    return `https://www.youtube.com/embed/${cleanVideoId}`;
+  } catch {
+    return null;
+  }
+}
+
 function TelegramPostEmbed({ url }) {
   const embedData = useMemo(() => parseTelegramEmbedUrl(url), [url]);
   const containerRef = useRef(null);
@@ -175,7 +218,7 @@ function TelegramPostEmbed({ url }) {
     script.src = "https://telegram.org/js/telegram-widget.js?22";
     script.setAttribute(
       "data-telegram-post",
-      `${embedData.channel}/${embedData.postId}`
+      `${embedData.channel}/${embedData.postId}`,
     );
     script.setAttribute("data-width", "100%");
     script.setAttribute("data-userpic", "true");
@@ -195,6 +238,29 @@ function TelegramPostEmbed({ url }) {
     <section className="article-telegram-embed-section">
       <div className="article-telegram-embed" ref={containerRef} />
     </section>
+  );
+}
+
+function YoutubeVideoEmbed({ url, title }) {
+  const embedUrl = useMemo(() => parseYoutubeEmbedUrl(url), [url]);
+
+  const isShort = useMemo(() => {
+    if (!url) return false;
+    return url.includes("shorts") || url.includes("youtu.be");
+  }, [url]);
+
+  if (!embedUrl) return null;
+
+  return (
+    <div className={`article-youtube-embed ${isShort ? "short" : ""}`}>
+      <iframe
+        src={embedUrl}
+        title={title || "YouTube video"}
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+      />
+    </div>
   );
 }
 
@@ -230,6 +296,7 @@ function NewsPage() {
       loadError: "Не удалось загрузить новость.",
       latestError: "Не удалось загрузить новости.",
       alreadyReacted: "Вы уже отреагировали на эту новость.",
+      telegramPostTitle: "Пост в Telegram",
     },
     uz: {
       notFoundTitle: "Yangilik topilmadi",
@@ -249,6 +316,7 @@ function NewsPage() {
       loadError: "Yangilikni yuklab bo‘lmadi.",
       latestError: "Yangiliklarni yuklab bo‘lmadi.",
       alreadyReacted: "Siz bu yangilikka allaqachon reaksiya bildirgansiz.",
+      telegramPostTitle: "Telegram posti",
     },
   };
 
@@ -265,8 +333,8 @@ function NewsPage() {
 
         const response = await fetch(
           `${API_BASE_URL}/api/articles/${encodeURIComponent(
-            slug
-          )}?lang=${encodeURIComponent(language)}`
+            slug,
+          )}?lang=${encodeURIComponent(language)}`,
         );
 
         const data = await response.json();
@@ -315,7 +383,7 @@ function NewsPage() {
         setSidebarLoading(true);
 
         const response = await fetch(
-          `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`
+          `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`,
         );
         const data = await response.json();
 
@@ -367,8 +435,8 @@ function NewsPage() {
         if (searchQuery) {
           const response = await fetch(
             `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(
-              language
-            )}&search=${encodeURIComponent(searchQuery)}`
+              language,
+            )}&search=${encodeURIComponent(searchQuery)}`,
           );
 
           const data = await response.json();
@@ -381,8 +449,8 @@ function NewsPage() {
         if (currentCategorySlug) {
           const response = await fetch(
             `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(
-              language
-            )}&category=${encodeURIComponent(currentCategorySlug)}`
+              language,
+            )}&category=${encodeURIComponent(currentCategorySlug)}`,
           );
 
           const data = await response.json();
@@ -394,7 +462,7 @@ function NewsPage() {
 
         if (searchResults.length < 6 || categoryResults.length < 6) {
           const response = await fetch(
-            `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`
+            `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`,
           );
 
           const data = await response.json();
@@ -406,19 +474,21 @@ function NewsPage() {
 
         const filteredSearch = searchResults.filter(
           (item) =>
-            item.slug !== slug && item.category?.slug === currentCategorySlug
+            item.slug !== slug && item.category?.slug === currentCategorySlug,
         );
 
         const filteredCategory = categoryResults.filter(
-          (item) => item.slug !== slug
+          (item) => item.slug !== slug,
         );
 
-        const filteredLatest = latestResults.filter((item) => item.slug !== slug);
+        const filteredLatest = latestResults.filter(
+          (item) => item.slug !== slug,
+        );
 
         const merged = mergeUniqueArticles(
           filteredSearch,
           filteredCategory,
-          filteredLatest
+          filteredLatest,
         ).slice(0, 6);
 
         if (isMounted) {
@@ -443,7 +513,9 @@ function NewsPage() {
   useEffect(() => {
     if (!article?.id) return;
 
-    const savedReaction = localStorage.getItem(`reaction_article_${article.id}`);
+    const savedReaction = localStorage.getItem(
+      `reaction_article_${article.id}`,
+    );
     if (savedReaction) {
       setSelectedReaction(savedReaction);
     } else {
@@ -460,6 +532,7 @@ function NewsPage() {
     article?.translation?.seoDescription?.trim() || "";
   const localizedContentHtml = article?.translation?.content || "";
   const telegramEmbedUrl = article?.translation?.telegramEmbedUrl || "";
+  const youtubeEmbedUrl = article?.translation?.youtubeEmbedUrl || "";
 
   const plainTextContent = useMemo(() => {
     return stripHtml(localizedContentHtml);
@@ -471,13 +544,13 @@ function NewsPage() {
 
   const shareLinks = {
     telegram: `https://t.me/share/url?url=${encodeURIComponent(
-      shareUrl
+      shareUrl,
     )}&text=${encodeURIComponent(shareTitle)}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-      shareUrl
+      shareUrl,
     )}`,
     threads: `https://www.threads.net/intent/post?text=${encodeURIComponent(
-      `${shareTitle} ${shareUrl}`
+      `${shareTitle} ${shareUrl}`,
     )}`,
   };
 
@@ -559,7 +632,7 @@ function NewsPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ type }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -680,6 +753,10 @@ function NewsPage() {
               </div>
             )}
 
+            {youtubeEmbedUrl && (
+              <YoutubeVideoEmbed url={youtubeEmbedUrl} title={localizedTitle} />
+            )}
+
             <AdBlock className="article-inline-ad" />
 
             <div className="article-extra">
@@ -779,7 +856,6 @@ function NewsPage() {
                   >
                     Threads
                   </a>
-
                 </div>
               </section>
 
@@ -839,7 +915,10 @@ function NewsPage() {
         <div className="news-feed-header">
           <h2>{t.related}</h2>
 
-          <Link to={`/${language}/category/${categorySlug}`} className="news-more">
+          <Link
+            to={`/${language}/category/${categorySlug}`}
+            className="news-more"
+          >
             {t.showMore} <span className="arrow">→</span>
           </Link>
         </div>
@@ -857,7 +936,9 @@ function NewsPage() {
                   className="more-news-card-link"
                   title={seoAlt}
                 >
-                  {item.coverImage && <img src={item.coverImage} alt={seoAlt} />}
+                  {item.coverImage && (
+                    <img src={item.coverImage} alt={seoAlt} />
+                  )}
                   <h3>{title}</h3>
                   <p>{text}</p>
                 </Link>

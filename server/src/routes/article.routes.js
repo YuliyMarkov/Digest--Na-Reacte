@@ -275,6 +275,7 @@ router.post("/articles", requireAuth, async (req, res) => {
               seoTitle: ru.seoTitle || null,
               seoDescription: ru.seoDescription || null,
               telegramEmbedUrl: ru.telegramEmbedUrl || null,
+              youtubeEmbedUrl: ru.youtubeEmbedUrl || null,
             },
             ...(uz && uz.title && uz.content
               ? [
@@ -286,6 +287,7 @@ router.post("/articles", requireAuth, async (req, res) => {
                     seoTitle: uz.seoTitle || null,
                     seoDescription: uz.seoDescription || null,
                     telegramEmbedUrl: uz.telegramEmbedUrl || null,
+                    youtubeEmbedUrl: uz.youtubeEmbedUrl || null,
                   },
                 ]
               : []),
@@ -487,6 +489,7 @@ router.put("/articles/:id", requireAuth, async (req, res) => {
           seoTitle: ru.seoTitle || null,
           seoDescription: ru.seoDescription || null,
           telegramEmbedUrl: ru.telegramEmbedUrl || null,
+          youtubeEmbedUrl: ru.youtubeEmbedUrl || null,
         },
       });
     } else {
@@ -500,11 +503,21 @@ router.put("/articles/:id", requireAuth, async (req, res) => {
           seoTitle: ru.seoTitle || null,
           seoDescription: ru.seoDescription || null,
           telegramEmbedUrl: ru.telegramEmbedUrl || null,
+          youtubeEmbedUrl: ru.youtubeEmbedUrl || null,
         },
       });
     }
 
-    if (uz && (uz.title || uz.content || uz.excerpt || uz.telegramEmbedUrl)) {
+    if (
+      uz &&
+      (
+        uz.title ||
+        uz.content ||
+        uz.excerpt ||
+        uz.telegramEmbedUrl ||
+        uz.youtubeEmbedUrl
+      )
+    ) {
       const uzTranslation = existingArticle.translations.find(
         (item) => item.locale === "uz"
       );
@@ -519,6 +532,7 @@ router.put("/articles/:id", requireAuth, async (req, res) => {
             seoTitle: uz.seoTitle || null,
             seoDescription: uz.seoDescription || null,
             telegramEmbedUrl: uz.telegramEmbedUrl || null,
+            youtubeEmbedUrl: uz.youtubeEmbedUrl || null,
           },
         });
       } else if (uz.title && uz.content) {
@@ -532,6 +546,7 @@ router.put("/articles/:id", requireAuth, async (req, res) => {
             seoTitle: uz.seoTitle || null,
             seoDescription: uz.seoDescription || null,
             telegramEmbedUrl: uz.telegramEmbedUrl || null,
+            youtubeEmbedUrl: uz.youtubeEmbedUrl || null,
           },
         });
       }

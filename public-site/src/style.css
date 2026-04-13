@@ -3497,14 +3497,39 @@ body.dark-theme .not-found-img.dark {
   margin: 0 auto !important;
 }
 
-@media (max-width: 768px) {
-  .article-telegram-embed-section {
-    margin: 20px 0;
-  }
+/* БАЗА */
+.article-youtube-embed {
+  position: relative;
+  width: 100%;
+  margin: 20px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
 }
 
-@media (max-width: 480px) {
-  .article-telegram-embed-section {
-    margin: 16px 0;
-  }
+/* ДЕФОЛТ (обычное видео 16:9) */
+.article-youtube-embed::before {
+  content: "";
+  display: block;
+  padding-top: 56.25%; /* 16:9 */
+}
+
+/* Shorts (вертикальные) */
+.article-youtube-embed.short {
+  max-width: 420px;
+  margin: 20px auto;
+}
+
+.article-youtube-embed.short::before {
+  padding-top: 177.77%; /* 9:16 */
+}
+
+/* iframe */
+.article-youtube-embed iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
