@@ -234,11 +234,7 @@ function TelegramPostEmbed({ url }) {
 
   if (!embedData) return null;
 
-  return (
-    <section className="article-telegram-embed-section">
-      <div className="article-telegram-embed" ref={containerRef} />
-    </section>
-  );
+  return <div className="article-telegram-embed" ref={containerRef} />;
 }
 
 function YoutubeVideoEmbed({ url, title }) {
@@ -296,7 +292,6 @@ function NewsPage() {
       loadError: "Не удалось загрузить новость.",
       latestError: "Не удалось загрузить новости.",
       alreadyReacted: "Вы уже отреагировали на эту новость.",
-      telegramPostTitle: "Пост в Telegram",
     },
     uz: {
       notFoundTitle: "Yangilik topilmadi",
@@ -316,7 +311,6 @@ function NewsPage() {
       loadError: "Yangilikni yuklab bo‘lmadi.",
       latestError: "Yangiliklarni yuklab bo‘lmadi.",
       alreadyReacted: "Siz bu yangilikka allaqachon reaksiya bildirgansiz.",
-      telegramPostTitle: "Telegram posti",
     },
   };
 
@@ -746,12 +740,7 @@ function NewsPage() {
               dangerouslySetInnerHTML={{ __html: localizedContentHtml }}
             />
 
-            {telegramEmbedUrl && (
-              <div className="article-embedded-post-block">
-                <div className="article-extra-title">{t.telegramPostTitle}</div>
-                <TelegramPostEmbed url={telegramEmbedUrl} />
-              </div>
-            )}
+            {telegramEmbedUrl && <TelegramPostEmbed url={telegramEmbedUrl} />}
 
             {youtubeEmbedUrl && (
               <YoutubeVideoEmbed url={youtubeEmbedUrl} title={localizedTitle} />

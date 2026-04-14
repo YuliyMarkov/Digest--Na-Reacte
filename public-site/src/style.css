@@ -3480,21 +3480,29 @@ body.dark-theme .not-found-img.dark {
 
 .article-telegram-embed {
   width: 100%;
+  margin: 20px 0;
   overflow: hidden;
+  background: transparent;
 }
 
-.article-telegram-embed iframe,
 .article-telegram-embed > div,
-.article-telegram-embed-section iframe,
-.article-telegram-embed-section > div {
+.article-telegram-embed iframe,
+.article-telegram-embed blockquote,
+.article-telegram-embed .telegram-widget-post {
+  width: 100% !important;
   max-width: 100% !important;
+  margin: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
-.article-telegram-embed blockquote,
-.telegram-widget-post {
-  max-width: 100% !important;
-  width: 100% !important;
-  margin: 0 auto !important;
+.article-telegram-embed iframe {
+  display: block;
+}
+
+.article-telegram-embed blockquote {
+  padding: 0 !important;
 }
 
 /* БАЗА */
