@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import RichTextEditor from "../components/RichTextEditor";
 
-const API_BASE_URL = "http://localhost:4000";
+const API_BASE_URL = "https://digest-news.uz";
 
 function generateSlug(text = "") {
   return text

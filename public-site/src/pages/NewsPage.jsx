@@ -5,7 +5,7 @@ import AdBlock from "../components/AdBlock";
 import Loader from "../components/Loader";
 import Seo from "../components/Seo";
 
-const API_BASE_URL = "http://localhost:4000";
+const API_BASE_URL = "https://digest-news.uz";
 
 function formatArticleDate(dateString, language) {
   if (!dateString) return "";
