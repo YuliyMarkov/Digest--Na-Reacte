@@ -1,74 +1,188 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Главная -->
   <url>
     <loc>https://digest-news.uz/ru</loc>
-  </url>
-  <url>
-    <loc>https://digest-news.uz/uz</loc>
+    <changefreq>hourly</changefreq>
+    <priority>1.0</priority>
   </url>
 
-  <!-- Категории -->
+  <url>
+    <loc>https://digest-news.uz/uz</loc>
+    <changefreq>hourly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
   <url>
     <loc>https://digest-news.uz/ru/category/uzbekistan</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
   </url>
+
   <url>
     <loc>https://digest-news.uz/ru/category/world</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
   </url>
+
   <url>
     <loc>https://digest-news.uz/ru/category/auto</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
   </url>
+
   <url>
     <loc>https://digest-news.uz/ru/category/incidents</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
   </url>
+
   <url>
     <loc>https://digest-news.uz/ru/category/science</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
   </url>
+
   <url>
     <loc>https://digest-news.uz/ru/category/economy</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://digest-news.uz/uz/category/uzbekistan</loc>
-  </url>
-  <url>
-    <loc>https://digest-news.uz/uz/category/world</loc>
-  </url>
-  <url>
-    <loc>https://digest-news.uz/uz/category/auto</loc>
-  </url>
-  <url>
-    <loc>https://digest-news.uz/uz/category/incidents</loc>
-  </url>
-  <url>
-    <loc>https://digest-news.uz/uz/category/science</loc>
-  </url>
-  <url>
-    <loc>https://digest-news.uz/uz/category/economy</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
   </url>
 
-  <!-- Статические страницы -->
+  <url>
+    <loc>https://digest-news.uz/uz/category/world</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/uz/category/auto</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/uz/category/incidents</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/uz/category/science</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/uz/category/economy</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
   <url>
     <loc>https://digest-news.uz/ru/about</loc>
+    <priority>0.5</priority>
   </url>
+
   <url>
     <loc>https://digest-news.uz/ru/contacts</loc>
+    <priority>0.5</priority>
   </url>
+
   <url>
     <loc>https://digest-news.uz/ru/privacy</loc>
+    <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://digest-news.uz/uz/about</loc>
+    <priority>0.5</priority>
   </url>
+
   <url>
     <loc>https://digest-news.uz/uz/contacts</loc>
+    <priority>0.5</priority>
   </url>
+
   <url>
     <loc>https://digest-news.uz/uz/privacy</loc>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/ru/news/reyting-samyh-vezhlivyh-stran-yaponiya-s-bolshim-otryvom-na-pervom-meste</loc>
+    <lastmod>2026-04-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/ru/news/v-uzbekistane-vuzy-smogut-provodit-zanyatiya-po-voskresenyam</loc>
+    <lastmod>2026-04-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/ru/news/otvetili-na-zvonok-riskuete-poteryat-dengi-v-uzbekistane-preduprezhdayut-o-moshennikah</loc>
+    <lastmod>2026-04-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/ru/news/kamery-v-uzbekistane-nachali-shtrafovat-voditeley-za-ispolzovanie-telefona</loc>
+    <lastmod>2026-04-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/ru/news/v-uzbekistane-obnaruzhili-pochti-neotlichimye-poddelnye-dollary</loc>
+    <lastmod>2026-04-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/ru/news/ofitsialno-v-uzbekistane-esli-vam-zaderzhivayut-zarplatu-vy-imeete-pravo-na-zabastovku</loc>
+    <lastmod>2026-04-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/ru/news/vazhno-znat-kak-pereoformit-sim-kartu-dlya-dostupa-k-bankovskim-prilozheniyam</loc>
+    <lastmod>2026-04-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/ru/news/srochno-do-22-aprelya-nuzhno-oformit-nomer-na-svoe-imya-dlya-dostupa-k-banku</loc>
+    <lastmod>2026-04-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/ru/news/weather-weekend-uzbekistan</loc>
+    <lastmod>2026-04-03</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://digest-news.uz/ru/news/pharmacy-recipe-dmed</loc>
+    <lastmod>2026-04-03</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
 
 </urlset>
