@@ -18,6 +18,22 @@
       name="description"
       content="Свежие новости Узбекистана и мира: политика, экономика, происшествия и технологии."
     />
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8HQBTTVPD4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      window.gtag = gtag;
+
+      gtag("js", new Date());
+
+      gtag("config", "G-8HQBTTVPD4", {
+        send_page_view: false,
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
