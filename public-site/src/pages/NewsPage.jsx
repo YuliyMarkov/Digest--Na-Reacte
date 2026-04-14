@@ -10,15 +10,46 @@ const API_BASE_URL = "https://digest-news.uz";
 function formatArticleDate(dateString, language) {
   if (!dateString) return "";
 
-  try {
-    return new Intl.DateTimeFormat(language === "uz" ? "uz-UZ" : "ru-RU", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }).format(new Date(dateString));
-  } catch {
-    return "";
-  }
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const months = {
+    ru: [
+      "января",
+      "февраля",
+      "марта",
+      "апреля",
+      "мая",
+      "июня",
+      "июля",
+      "августа",
+      "сентября",
+      "октября",
+      "ноября",
+      "декабря",
+    ],
+    uz: [
+      "yanvar",
+      "fevral",
+      "mart",
+      "aprel",
+      "may",
+      "iyun",
+      "iyul",
+      "avgust",
+      "sentyabr",
+      "oktyabr",
+      "noyabr",
+      "dekabr",
+    ],
+  };
+
+  const langKey = language === "uz" ? "uz" : "ru";
+  const day = date.getDate();
+  const month = months[langKey][date.getMonth()];
+  const year = date.getFullYear();
+
+  return `${day} ${month} ${year}`;
 }
 
 function getCategoryName(category, language) {
