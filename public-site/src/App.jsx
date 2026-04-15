@@ -1,11 +1,11 @@
-import { Suspense, lazy, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { Routes, Route, useParams, Navigate } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
-import TopWidgets from "./components/TopWidgets";
 import Loader from "./components/Loader";
 
+const TopWidgets = lazy(() => import("./components/TopWidgets"));
 const ReelsModal = lazy(() => import("./components/ReelsModal"));
 const HomePage = lazy(() => import("./pages/HomePage"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
@@ -29,6 +29,31 @@ function NewsPageWrapper() {
 function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
+  const [showTopWidgets, setShowTopWidgets] = useState(false);
+
+  useEffect(() => {
+    let timeoutId;
+    let idleId;
+
+    const enableWidgets = () => {
+      setShowTopWidgets(true);
+    };
+
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(enableWidgets, { timeout: 2000 });
+    } else {
+      timeoutId = window.setTimeout(enableWidgets, 1200);
+    }
+
+    return () => {
+      if (idleId && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+    };
+  }, []);
 
   const open = (url) => {
     setVideoUrl(url);
@@ -42,9 +67,14 @@ function App() {
 
   return (
     <>
-      <Header />
-      <TopWidgets />
       <ScrollToTop />
+      <Header />
+
+      {showTopWidgets ? (
+        <Suspense fallback={null}>
+          <TopWidgets />
+        </Suspense>
+      ) : null}
 
       <Suspense fallback={<Loader />}>
         <Routes>
