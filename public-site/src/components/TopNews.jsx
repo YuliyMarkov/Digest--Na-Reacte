@@ -6,6 +6,7 @@ function TopNews({
   featuredArticles = [],
   latestArticles = [],
   error = "",
+  loading = false,
 }) {
   const { language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -21,6 +22,12 @@ function TopNews({
       error: "Не удалось загрузить новости",
       prev: "Previous slide",
       next: "Next slide",
+      fallbackTitle: "Свежие новости Узбекистана и мира",
+      fallbackItems: [
+        "Загрузка главных новостей...",
+        "Загрузка последних материалов...",
+        "Подготовка ленты новостей...",
+      ],
     },
     uz: {
       main: "Asosiy",
@@ -29,6 +36,12 @@ function TopNews({
       error: "Yangiliklarni yuklab bo‘lmadi",
       prev: "Previous slide",
       next: "Next slide",
+      fallbackTitle: "O‘zbekiston va dunyo bo‘yicha so‘nggi yangiliklar",
+      fallbackItems: [
+        "Asosiy yangiliklar yuklanmoqda...",
+        "So‘nggi materiallar yuklanmoqda...",
+        "Yangiliklar lentasi tayyorlanmoqda...",
+      ],
     },
   };
 
@@ -91,6 +104,9 @@ function TopNews({
     deltaXRef.current = 0;
   };
 
+  const shouldShowFallbackHero = loading && sliderArticles.length === 0;
+  const shouldShowFallbackSidebar = loading && sidebarArticles.length === 0;
+
   return (
     <section className="top-news">
       <div className="top-news-layout">
@@ -102,6 +118,27 @@ function TopNews({
           {error ? (
             <div className="news-feed-empty">
               <p>{t.error}</p>
+            </div>
+          ) : shouldShowFallbackHero ? (
+            <div className="top-news-slider">
+              <div className="top-news-viewport">
+                <article className="top-slide">
+                  <div className="top-slide-link" aria-hidden="true">
+                    <img
+                      src="/preview.jpg"
+                      alt={t.fallbackTitle}
+                      width="1200"
+                      height="630"
+                      loading="eager"
+                      fetchPriority="high"
+                      decoding="async"
+                    />
+                    <div className="top-slide-overlay">
+                      <h3>{t.fallbackTitle}</h3>
+                    </div>
+                  </div>
+                </article>
+              </div>
             </div>
           ) : sliderArticles.length === 0 ? (
             <div className="news-feed-empty">
@@ -205,6 +242,12 @@ function TopNews({
             {error ? (
               <ul>
                 <li>{t.error}</li>
+              </ul>
+            ) : shouldShowFallbackSidebar ? (
+              <ul>
+                {t.fallbackItems.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
               </ul>
             ) : sidebarArticles.length === 0 ? (
               <ul>

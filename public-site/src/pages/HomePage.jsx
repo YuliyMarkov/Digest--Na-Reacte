@@ -107,7 +107,6 @@ function HomePage({ onOpenReel }) {
   }, [articles]);
 
   const firstImage = featuredArticles[0]?.coverImage || "/preview.jpg";
-
   const componentError = loading ? "" : error;
 
   return (
@@ -125,6 +124,7 @@ function HomePage({ onOpenReel }) {
         featuredArticles={featuredArticles}
         latestArticles={latestArticles}
         error={componentError}
+        loading={loading}
       />
 
       <AdBlock />
