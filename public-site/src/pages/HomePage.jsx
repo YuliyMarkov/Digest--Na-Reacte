@@ -1,12 +1,11 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import TopNews from "../components/TopNews";
+import NewsFeed from "../components/NewsFeed";
+import ReelsSection from "../components/ReelsSection";
+import MoreNews from "../components/MoreNews";
+import AdBlock from "../components/AdBlock";
 import { useLanguage } from "../context/useLanguage";
 import Seo from "../components/Seo";
-
-const NewsFeed = lazy(() => import("../components/NewsFeed"));
-const ReelsSection = lazy(() => import("../components/ReelsSection"));
-const MoreNews = lazy(() => import("../components/MoreNews"));
-const AdBlock = lazy(() => import("../components/AdBlock"));
 
 const API_BASE_URL = "https://digest-news.uz";
 
@@ -16,7 +15,6 @@ function HomePage({ onOpenReel }) {
   const [loading, setLoading] = useState(true);
   const [articles, setArticles] = useState([]);
   const [error, setError] = useState("");
-  const [showBelowFold, setShowBelowFold] = useState(false);
 
   const seoContent = {
     ru: {
@@ -74,32 +72,6 @@ function HomePage({ onOpenReel }) {
     };
   }, [language]);
 
-  useEffect(() => {
-    let timeoutId;
-    let idleId;
-
-    setShowBelowFold(false);
-
-    const enableBelowFold = () => {
-      setShowBelowFold(true);
-    };
-
-    if ("requestIdleCallback" in window) {
-      idleId = window.requestIdleCallback(enableBelowFold, { timeout: 2000 });
-    } else {
-      timeoutId = window.setTimeout(enableBelowFold, 1200);
-    }
-
-    return () => {
-      if (idleId && "cancelIdleCallback" in window) {
-        window.cancelIdleCallback(idleId);
-      }
-      if (timeoutId) {
-        window.clearTimeout(timeoutId);
-      }
-    };
-  }, [language]);
-
   const {
     featuredArticles,
     latestArticles,
@@ -154,15 +126,15 @@ function HomePage({ onOpenReel }) {
         error={componentError}
       />
 
-      {showBelowFold ? (
-        <Suspense fallback={null}>
-          <AdBlock />
-          <NewsFeed articles={newsFeedArticles} error={componentError} />
-          <ReelsSection onOpenReel={onOpenReel} />
-          <AdBlock />
-          <MoreNews articles={moreNewsArticles} error={componentError} />
-        </Suspense>
-      ) : null}
+      <AdBlock />
+
+      <NewsFeed articles={newsFeedArticles} error={componentError} />
+
+      <ReelsSection onOpenReel={onOpenReel} />
+
+      <AdBlock />
+
+      <MoreNews articles={moreNewsArticles} error={componentError} />
     </main>
   );
 }
