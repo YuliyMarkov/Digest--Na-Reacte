@@ -9,6 +9,9 @@ function Seo({
   schema = null,
   locale = "ru_RU",
   preloadImage = "",
+  publishedTime = "",
+  modifiedTime = "",
+  section = "",
 }) {
   const siteUrl = "https://digest-news.uz";
   const siteName = "Дайджест";
@@ -31,6 +34,19 @@ function Seo({
       ? preloadImage.trim()
       : "";
 
+  const safePublishedTime =
+    typeof publishedTime === "string" && publishedTime.trim()
+      ? publishedTime.trim()
+      : "";
+
+  const safeModifiedTime =
+    typeof modifiedTime === "string" && modifiedTime.trim()
+      ? modifiedTime.trim()
+      : "";
+
+  const safeSection =
+    typeof section === "string" && section.trim() ? section.trim() : "";
+
   const fullTitle = safeTitle.includes("Дайджест")
     ? safeTitle
     : `${safeTitle} — Дайджест`;
@@ -49,7 +65,7 @@ function Seo({
 
   const normalizedSchema = schema
     ? JSON.parse(
-        JSON.stringify(schema).replaceAll('"__PAGE_URL__"', `"${fullUrl}"`)
+        JSON.stringify(schema).replaceAll('"__PAGE_URL__"', `"${fullUrl}"`),
       )
     : null;
 
@@ -73,11 +89,24 @@ function Seo({
       <meta property="og:site_name" content={siteName} />
       <meta property="og:locale" content={locale} />
 
+      {type === "article" && safePublishedTime && (
+        <meta property="article:published_time" content={safePublishedTime} />
+      )}
+
+      {type === "article" && safeModifiedTime && (
+        <meta property="article:modified_time" content={safeModifiedTime} />
+      )}
+
+      {type === "article" && safeSection && (
+        <meta property="article:section" content={safeSection} />
+      )}
+
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={safeDescription} />
       <meta name="twitter:image" content={fullImage} />
       <meta name="twitter:image:alt" content={fullTitle} />
+      <meta name="twitter:url" content={fullUrl} />
 
       <link rel="canonical" href={fullUrl} />
 

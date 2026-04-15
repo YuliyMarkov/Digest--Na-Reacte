@@ -242,7 +242,8 @@ function TelegramPostEmbed({ url }) {
   useEffect(() => {
     if (!embedData || !containerRef.current) return;
 
-    containerRef.current.innerHTML = "";
+    const container = containerRef.current;
+    container.innerHTML = "";
 
     const script = document.createElement("script");
     script.async = true;
@@ -254,12 +255,10 @@ function TelegramPostEmbed({ url }) {
     script.setAttribute("data-width", "100%");
     script.setAttribute("data-userpic", "true");
 
-    containerRef.current.appendChild(script);
+    container.appendChild(script);
 
     return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = "";
-      }
+      container.innerHTML = "";
     };
   }, [embedData]);
 
@@ -596,6 +595,10 @@ function NewsPage() {
   const publishedDateIso = article?.publishedAt || null;
   const modifiedDateIso = article?.updatedAt || publishedDateIso || null;
 
+  const schemaKeywords = extractSearchQuery(localizedTitle)
+    .split(" ")
+    .filter(Boolean);
+
   const schema = article
     ? {
         "@context": "https://schema.org",
@@ -609,6 +612,8 @@ function NewsPage() {
                 : `https://digest-news.uz${article.coverImage}`,
             ]
           : [],
+        ...(publishedDateIso ? { datePublished: publishedDateIso } : {}),
+        ...(modifiedDateIso ? { dateModified: modifiedDateIso } : {}),
         author: {
           "@type": "Organization",
           name: "Дайджест",
@@ -625,8 +630,11 @@ function NewsPage() {
           "@type": "WebPage",
           "@id": "__PAGE_URL__",
         },
-        ...(publishedDateIso ? { datePublished: publishedDateIso } : {}),
-        ...(modifiedDateIso ? { dateModified: modifiedDateIso } : {}),
+        isAccessibleForFree: true,
+        articleSection: localizedCategory || undefined,
+        inLanguage: language === "uz" ? "uz-UZ" : "ru-RU",
+        genre: ["News"],
+        keywords: schemaKeywords.length > 0 ? schemaKeywords : undefined,
       }
     : null;
 
@@ -721,6 +729,9 @@ function NewsPage() {
           canonical={`/${language}/news/${slug}`}
           type="article"
           locale={locale}
+          publishedTime={publishedDateIso || ""}
+          modifiedTime={modifiedDateIso || ""}
+          section={localizedCategory || ""}
         />
 
         <section className="article-page">
@@ -742,6 +753,9 @@ function NewsPage() {
         type="article"
         schema={schema}
         locale={locale}
+        publishedTime={publishedDateIso || ""}
+        modifiedTime={modifiedDateIso || ""}
+        section={localizedCategory || ""}
       />
 
       <section className="article-page">
