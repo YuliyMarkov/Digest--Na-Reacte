@@ -106,7 +106,8 @@ function HomePage({ onOpenReel }) {
     };
   }, [articles]);
 
-  const firstImage = featuredArticles[0]?.coverImage || "";
+  const firstImage = featuredArticles[0]?.coverImage || "/preview.jpg";
+
   const componentError = loading ? "" : error;
 
   return (
