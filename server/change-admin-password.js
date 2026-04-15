@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
-import prisma from "./src/lib/prisma.js"; // ← ВАЖНО
+import { prisma } from "./src/lib/prisma.js"; // ← ВАЖНО
 
 async function main() {
   const email = "admin@digest.uz";
-  const newPassword = "НОВЫЙ_ПАРОЛЬ";
+  const newPassword = "S@shaY@ndex2026";
 
   const passwordHash = await bcrypt.hash(newPassword, 10);
 
