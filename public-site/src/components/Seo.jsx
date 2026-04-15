@@ -3,8 +3,7 @@ import { Helmet } from "react-helmet-async";
 function Seo({
   title = "Дайджест — новости Узбекистана",
   description = "Свежие новости Узбекистана и мира.",
-  canonical = "",
-  image = "/preview.jpg",
+  canonical = "",  
   type = "website",
   schema = null,
   locale = "ru_RU",
@@ -26,8 +25,7 @@ function Seo({
       ? description.trim()
       : "Свежие новости Узбекистана и мира.";
 
-  const safeImage =
-    typeof image === "string" && image.trim() ? image.trim() : "/preview.jpg";
+  const safeImage = "/preview.jpg";
 
   const safePreloadImage =
     typeof preloadImage === "string" && preloadImage.trim()
