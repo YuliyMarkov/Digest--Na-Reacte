@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../context/useLanguage";
 
@@ -9,9 +9,6 @@ function TopNews({
 }) {
   const { language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const trackRef = useRef(null);
-  const startXRef = useRef(null);
-  const deltaXRef = useRef(0);
 
   const uiText = {
     ru: {
@@ -44,51 +41,23 @@ function TopNews({
     [latestArticles]
   );
 
-  useEffect(() => {
-    if (sliderArticles.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) =>
-        prev === sliderArticles.length - 1 ? 0 : prev + 1
-      );
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [sliderArticles]);
+  const hasSlides = sliderArticles.length > 0;
+  const safeIndex =
+    hasSlides && currentIndex > sliderArticles.length - 1 ? 0 : currentIndex;
+  const activeArticle = hasSlides ? sliderArticles[safeIndex] : null;
 
   const goToPrev = () => {
+    if (sliderArticles.length <= 1) return;
     setCurrentIndex((prev) =>
       prev === 0 ? sliderArticles.length - 1 : prev - 1
     );
   };
 
   const goToNext = () => {
+    if (sliderArticles.length <= 1) return;
     setCurrentIndex((prev) =>
       prev === sliderArticles.length - 1 ? 0 : prev + 1
     );
-  };
-
-  const handleTouchStart = (event) => {
-    startXRef.current = event.touches[0].clientX;
-    deltaXRef.current = 0;
-  };
-
-  const handleTouchMove = (event) => {
-    if (startXRef.current === null) return;
-    deltaXRef.current = event.touches[0].clientX - startXRef.current;
-  };
-
-  const handleTouchEnd = () => {
-    if (startXRef.current === null) return;
-
-    if (deltaXRef.current > 50) {
-      goToPrev();
-    } else if (deltaXRef.current < -50) {
-      goToNext();
-    }
-
-    startXRef.current = null;
-    deltaXRef.current = 0;
   };
 
   return (
@@ -103,80 +72,71 @@ function TopNews({
             <div className="news-feed-empty">
               <p>{t.error}</p>
             </div>
-          ) : sliderArticles.length === 0 ? (
+          ) : !activeArticle ? (
             <div className="news-feed-empty">
               <p>{t.empty}</p>
             </div>
           ) : (
             <>
               <div className="top-news-slider">
-                <button
-                  type="button"
-                  className="slider-btn prev"
-                  onClick={goToPrev}
-                  aria-label={t.prev}
-                >
-                  ‹
-                </button>
-
-                <div
-                  className="top-news-viewport"
-                  onTouchStart={handleTouchStart}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                >
-                  <div
-                    className="top-news-track"
-                    ref={trackRef}
-                    style={{
-                      transform:
-                        currentIndex === 0
-                          ? "translateX(0)"
-                          : `translateX(-${currentIndex * 100}%)`,
-                    }}
+                {sliderArticles.length > 1 && (
+                  <button
+                    type="button"
+                    className="slider-btn prev"
+                    onClick={goToPrev}
+                    aria-label={t.prev}
                   >
-                    {sliderArticles.map((article, index) => {
-                      const title = article.translation?.title || article.slug;
-                      const seoTitle =
-                        article.translation?.seoTitle?.trim() || title;
+                    ‹
+                  </button>
+                )}
 
-                      return (
-                        <article className="top-slide" key={article.id}>
-                          <Link
-                            to={`/${language}/news/${article.slug}`}
-                            className="top-slide-link"
-                            title={seoTitle}
-                          >
-                            {article.coverImage && (
-                              <img
-                                src={article.coverImage}
-                                alt={seoTitle}
-                                width="1200"
-                                height="630"
-                                loading={index === 0 ? "eager" : "lazy"}
-                                fetchPriority={index === 0 ? "high" : "auto"}
-                                decoding="async"
-                              />
-                            )}
+                <div className="top-news-viewport">
+                  <article className="top-slide">
+                    <Link
+                      to={`/${language}/news/${activeArticle.slug}`}
+                      className="top-slide-link"
+                      title={
+                        activeArticle.translation?.seoTitle?.trim() ||
+                        activeArticle.translation?.title ||
+                        activeArticle.slug
+                      }
+                    >
+                      {activeArticle.coverImage && (
+                        <img
+                          src={activeArticle.coverImage}
+                          alt={
+                            activeArticle.translation?.seoTitle?.trim() ||
+                            activeArticle.translation?.title ||
+                            activeArticle.slug
+                          }
+                          width="1200"
+                          height="630"
+                          loading="eager"
+                          fetchPriority="high"
+                          decoding="async"
+                        />
+                      )}
 
-                            <div className="top-slide-overlay">
-                              <h3>{title}</h3>
-                            </div>
-                          </Link>
-                        </article>
-                      );
-                    })}
-                  </div>
+                      <div className="top-slide-overlay">
+                        <h3>
+                          {activeArticle.translation?.title ||
+                            activeArticle.slug}
+                        </h3>
+                      </div>
+                    </Link>
+                  </article>
                 </div>
 
-                <button
-                  type="button"
-                  className="slider-btn next"
-                  onClick={goToNext}
-                  aria-label={t.next}
-                >
-                  ›
-                </button>
+                {sliderArticles.length > 1 && (
+                  <button
+                    type="button"
+                    className="slider-btn next"
+                    onClick={goToNext}
+                    aria-label={t.next}
+                  >
+                    ›
+                  </button>
+                )}
               </div>
 
               {sliderArticles.length > 1 && (
@@ -186,7 +146,7 @@ function TopNews({
                       key={index}
                       type="button"
                       className={`top-news-dot ${
-                        index === currentIndex ? "active" : ""
+                        index === safeIndex ? "active" : ""
                       }`}
                       onClick={() => setCurrentIndex(index)}
                       aria-label={`Go to slide ${index + 1}`}
