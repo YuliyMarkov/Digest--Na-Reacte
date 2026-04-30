@@ -3541,3 +3541,47 @@ body.dark-theme .not-found-img.dark {
   height: 100%;
   border: 0;
 }
+
+.article-content img,
+.rich-text-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 24px auto;
+  border-radius: 16px;
+}
+
+.article-content blockquote,
+.rich-text-content blockquote {
+  margin: 24px 0;
+  padding: 18px 22px;
+  border-left: 4px solid #1d4ed8;
+  background: #f1f5f9;
+  border-radius: 14px;
+  color: #1e293b;
+  font-style: italic;
+}
+
+.article-content blockquote p,
+.rich-text-content blockquote p {
+  margin: 0;
+}
+
+.article-content p,
+.rich-text-content p {
+  margin: 16px 0;
+  line-height: 1.7;
+}
+
+.article-content ul,
+.article-content ol,
+.rich-text-content ul,
+.rich-text-content ol {
+  margin: 16px 0 16px 24px;
+  padding-left: 18px;
+}
+
+.article-content li,
+.rich-text-content li {
+  margin: 8px 0;
+}
