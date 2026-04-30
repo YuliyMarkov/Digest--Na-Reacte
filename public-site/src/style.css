@@ -3585,3 +3585,19 @@ body.dark-theme .not-found-img.dark {
 .rich-text-content li {
   margin: 8px 0;
 }
+
+.article-main .article-content blockquote,
+.article-main .rich-text-content blockquote {
+  margin: 24px 0;
+  padding: 18px 22px;
+  border-left: 4px solid #2563eb;
+  background: #f1f5f9;
+  border-radius: 14px;
+  color: #1e293b;
+  font-style: italic;
+}
+
+.article-main .article-content blockquote p,
+.article-main .rich-text-content blockquote p {
+  margin: 0;
+}
