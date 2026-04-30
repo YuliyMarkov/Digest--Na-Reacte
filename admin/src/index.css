@@ -473,3 +473,26 @@ input {
   background: #ffe5e5;
   color: #b42318;
 }
+
+.rich-editor-toolbar button.active {
+  background: #111827;
+  color: #ffffff;
+}
+
+.rich-editor-field blockquote {
+  margin: 18px 0;
+  padding: 16px 18px;
+  border-left: 4px solid #2563eb;
+  background: #f1f5f9;
+  border-radius: 12px;
+  color: #1e293b;
+  font-style: italic;
+}
+
+.rich-editor-field img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 18px auto;
+  border-radius: 14px;
+}
