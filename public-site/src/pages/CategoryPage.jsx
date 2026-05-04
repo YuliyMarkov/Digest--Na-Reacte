@@ -175,7 +175,7 @@ function CategoryPage() {
           <h1>{pageTitle}</h1>
         </div>
 
-        <AdBlock />
+        <AdBlock type="news" />
 
         {error ? (
           <div className="category-empty-state">
@@ -234,7 +234,7 @@ function CategoryPage() {
         )}
       </section>
 
-      <AdBlock />
+      <AdBlock type="news" />
     </main>
   );
 }

@@ -1,15 +1,10 @@
 import { useEffect, useId, useRef } from "react";
 
-const ADS_ENABLED = false;
+const ADS_ENABLED = true;
 
 const AD_SLOTS = {
-  fluid: {
-    slot: "8383624763",
-    format: "fluid",
-    layoutKey: "-6g+c5+15-k+cg",
-  },
   news: {
-    slot: "2022230542",
+    slot: "2377228427",
     format: "auto",
     fullWidthResponsive: true,
   },
@@ -30,7 +25,9 @@ function AdBlock({ type = "news", className = "" }) {
 
     const timer = setTimeout(() => {
       try {
-        if (adElement.getAttribute("data-adsbygoogle-status") === "done") return;
+        if (adElement.getAttribute("data-adsbygoogle-status") === "done") {
+          return;
+        }
 
         window.adsbygoogle = window.adsbygoogle || [];
         window.adsbygoogle.push({});
@@ -46,7 +43,7 @@ function AdBlock({ type = "news", className = "" }) {
 
   return (
     <section
-      className={`horizontal-ad adsense-block adsense-block-${type} ${className}`.trim()}
+      className={`horizontal-ad adsense-block adsense-block-news ${className}`.trim()}
       aria-label="Реклама"
     >
       <div className="horizontal-ad-box">
@@ -59,12 +56,9 @@ function AdBlock({ type = "news", className = "" }) {
             data-ad-client="ca-pub-9284192456639550"
             data-ad-slot={config.slot}
             data-ad-format={config.format}
-            {...(config.layoutKey
-              ? { "data-ad-layout-key": config.layoutKey }
-              : {})}
-            {...(config.fullWidthResponsive
-              ? { "data-full-width-responsive": "true" }
-              : {})}
+            data-full-width-responsive={
+              config.fullWidthResponsive ? "true" : "false"
+            }
           />
         </div>
       </div>
