@@ -1,6 +1,6 @@
-import { useEffect, useId } from "react";
+import { useEffect, useId, useRef } from "react";
 
-const ADS_ENABLED = false;
+const ADS_ENABLED = true;
 
 const AD_SLOTS = {
   fluid: {
@@ -17,30 +17,30 @@ const AD_SLOTS = {
 
 function AdBlock({ type = "news", className = "" }) {
   const reactId = useId();
-  const adKey = reactId.replace(/:/g, "");
+  const adRef = useRef(null);
+  const adKey = `${type}-${reactId.replace(/:/g, "")}`;
   const config = AD_SLOTS[type] || AD_SLOTS.news;
 
   useEffect(() => {
-    if (!ADS_ENABLED) return;
+    if (!ADS_ENABLED || !adRef.current) return;
+
+    const adElement = adRef.current;
+
+    if (adElement.getAttribute("data-adsbygoogle-status") === "done") return;
 
     const timer = setTimeout(() => {
       try {
-        const ads = document.querySelectorAll(".adsbygoogle");
+        if (adElement.getAttribute("data-adsbygoogle-status") === "done") return;
 
-        ads.forEach((ad) => {
-          // если уже отрендерено — не трогаем
-          if (ad.getAttribute("data-adsbygoogle-status") === "done") return;
-
-          window.adsbygoogle = window.adsbygoogle || [];
-          window.adsbygoogle.push({});
-        });
+        window.adsbygoogle = window.adsbygoogle || [];
+        window.adsbygoogle.push({});
       } catch (error) {
         console.error("AdSense render error:", error);
       }
-    }, 100);
+    }, 300);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [adKey]);
 
   if (!ADS_ENABLED) return null;
 
@@ -52,6 +52,7 @@ function AdBlock({ type = "news", className = "" }) {
       <div className="horizontal-ad-box">
         <div className="horizontal-ad-link">
           <ins
+            ref={adRef}
             key={adKey}
             className="adsbygoogle"
             style={{ display: "block" }}
