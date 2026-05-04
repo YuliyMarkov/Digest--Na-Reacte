@@ -2009,9 +2009,7 @@ body.dark-theme .article-telegram-subscribe {
   border-radius: 12px;
   background: linear-gradient(90deg, #1a1a1a, #262626);
   border: 1px dashed rgba(255, 255, 255, 0.14);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  text-align: center;
 }
 
 .adsense-slot::before {

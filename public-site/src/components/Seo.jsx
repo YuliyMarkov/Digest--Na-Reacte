@@ -113,7 +113,7 @@ function Seo({
           rel="preload"
           as="image"
           href={fullPreloadImage}
-          fetchpriority="high"
+          fetchPriority="high"
         />
       )}
 

@@ -791,7 +791,7 @@ function NewsPage() {
               <YoutubeVideoEmbed url={youtubeEmbedUrl} title={localizedTitle} />
             )}
 
-            <AdBlock className="article-inline-ad" />
+            <AdBlock type="fluid" className="article-inline-ad" />
 
             <div className="article-extra">
               <section className="article-reactions" aria-label="Реакции">
@@ -943,8 +943,8 @@ function NewsPage() {
         </div>
       </section>
 
-      <AdBlock />
-
+      <AdBlock type="news" />
+      
       <section className="more-news-section">
         <div className="news-feed-header">
           <h2>{t.related}</h2>

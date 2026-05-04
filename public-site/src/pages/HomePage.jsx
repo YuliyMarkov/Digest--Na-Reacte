@@ -127,13 +127,13 @@ function HomePage({ onOpenReel }) {
         loading={loading}
       />
 
-      <AdBlock />
+      <AdBlock type="news" />
 
       <NewsFeed articles={newsFeedArticles} error={componentError} />
 
       <ReelsSection onOpenReel={onOpenReel} />
 
-      <AdBlock />
+      <AdBlock type="fluid" />
 
       <MoreNews articles={moreNewsArticles} error={componentError} />
     </main>
