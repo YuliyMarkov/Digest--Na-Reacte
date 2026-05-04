@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef } from "react";
 
-const ADS_ENABLED = true;
+const ADS_ENABLED = false;
 
 const AD_SLOTS = {
   fluid: {
