@@ -1,30 +1,59 @@
-const ADS_ENABLED = false;
+import { useEffect, useId } from "react";
 
-function AdBlock({ className = "" }) {
+const ADS_ENABLED = true;
+
+const AD_SLOTS = {
+  fluid: {
+    slot: "8383624763",
+    format: "fluid",
+    layoutKey: "-6g+c5+15-k+cg",
+  },
+  news: {
+    slot: "2022230542",
+    format: "auto",
+    fullWidthResponsive: true,
+  },
+};
+
+function AdBlock({ type = "news", className = "" }) {
+  const reactId = useId();
+  const adKey = reactId.replace(/:/g, "");
+  const config = AD_SLOTS[type] || AD_SLOTS.news;
+
+  useEffect(() => {
+    if (!ADS_ENABLED) return;
+
+    try {
+      window.adsbygoogle = window.adsbygoogle || [];
+      window.adsbygoogle.push({});
+    } catch (error) {
+      console.error("AdSense render error:", error);
+    }
+  }, []);
+
   if (!ADS_ENABLED) return null;
 
   return (
     <section
-      className={`horizontal-ad adsense-block ${className}`.trim()}
+      className={`horizontal-ad adsense-block adsense-block-${type} ${className}`.trim()}
       aria-label="Реклама"
     >
       <div className="horizontal-ad-box">
         <div className="horizontal-ad-link">
-          <div className="adsense-slot adsense-slot-horizontal">
-            {/* Google AdSense horizontal slot */}
-
-            {/* Когда подключишь AdSense — раскомментируй и вставь свои данные */}
-            {/*
-            <ins
-              className="adsbygoogle"
-              style={{ display: "block" }}
-              data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
-              data-ad-slot="XXXXXXXXXX"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            ></ins>
-            */}
-          </div>
+          <ins
+            key={adKey}
+            className="adsbygoogle"
+            style={{ display: "block" }}
+            data-ad-client="ca-pub-9284192456639550"
+            data-ad-slot={config.slot}
+            data-ad-format={config.format}
+            {...(config.layoutKey
+              ? { "data-ad-layout-key": config.layoutKey }
+              : {})}
+            {...(config.fullWidthResponsive
+              ? { "data-full-width-responsive": "true" }
+              : {})}
+          />
         </div>
       </div>
     </section>
