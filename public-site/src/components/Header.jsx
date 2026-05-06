@@ -185,7 +185,18 @@ function Header() {
       <div className="container header-container">
         <div className="logo">
           <Link to={`/${language}`} aria-label={t.homeLabel} onClick={closeMenu}>
-            <img src="/New_Logo.webp" alt="Дайджест Logo" />
+            <img
+              src={
+                language === 'uz'
+                  ? '/New_Logo_Uz.webp'
+                  : '/New_Logo.webp'
+              }
+              alt={
+                language === 'uz'
+                  ? 'Dayjest Logo'
+                  : 'Дайджест Logo'
+              }
+            />
           </Link>
         </div>
 
@@ -292,6 +303,7 @@ function Header() {
               target="_blank"
               rel="noopener noreferrer"
             ></a>
+
             <a
               href="https://www.instagram.com/digest.uzbekistan/"
               className="social instagram"
@@ -299,6 +311,7 @@ function Header() {
               target="_blank"
               rel="noopener noreferrer"
             ></a>
+
             <a
               href="https://www.youtube.com/@digest.uzbekistan"
               className="social youtube"
@@ -396,6 +409,7 @@ function Header() {
               value={desktopSearchQuery}
               onChange={(e) => setDesktopSearchQuery(e.target.value)}
             />
+
             <button type="submit" className="desktop-search-btn">
               {t.searchButton}
             </button>
