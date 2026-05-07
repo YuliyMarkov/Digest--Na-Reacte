@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef } from "react";
 
-const ADS_ENABLED = false;
+const ADS_ENABLED = true;
 
 const AD_SLOTS = {
   news: {
