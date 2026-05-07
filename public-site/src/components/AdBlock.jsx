@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const ADS_ENABLED = true;
+const ADS_ENABLED = false;
 
 function AdBlock({ className = "" }) {
   const adRef = useRef(null);
