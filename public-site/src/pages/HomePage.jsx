@@ -3,7 +3,6 @@ import TopNews from "../components/TopNews";
 import NewsFeed from "../components/NewsFeed";
 import ReelsSection from "../components/ReelsSection";
 import MoreNews from "../components/MoreNews";
-import AdBlock from "../components/AdBlock";
 import { useLanguage } from "../context/useLanguage";
 import YandexAdBlock from "../components/YandexAdBlock";
 import Seo from "../components/Seo";
@@ -44,7 +43,7 @@ function HomePage({ onOpenReel }) {
 
         const response = await fetch(
           `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`,
-          { signal: controller.signal }
+          { signal: controller.signal },
         );
 
         const data = await response.json();
@@ -83,7 +82,7 @@ function HomePage({ onOpenReel }) {
     const nonFeatured = articles.filter((article) => !article.isFeatured);
 
     const uzbekistanNews = nonFeatured.filter(
-      (article) => article.category?.slug === "uzbekistan"
+      (article) => article.category?.slug === "uzbekistan",
     );
 
     const featuredArticles =
@@ -96,7 +95,7 @@ function HomePage({ onOpenReel }) {
     const uzbekistanIds = new Set(newsFeedArticles.map((article) => article.id));
 
     const moreNewsArticles = nonFeatured.filter(
-      (article) => !featuredIds.has(article.id) && !uzbekistanIds.has(article.id)
+      (article) => !featuredIds.has(article.id) && !uzbekistanIds.has(article.id),
     );
 
     return {
