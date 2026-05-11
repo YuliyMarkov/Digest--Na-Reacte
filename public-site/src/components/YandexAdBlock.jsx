@@ -9,16 +9,35 @@ function YandexAdBlock({ className = "" }) {
   useEffect(() => {
     if (!ADS_ENABLED) return;
 
-    window.yaContextCb = window.yaContextCb || [];
+    let attempts = 0;
 
-    window.yaContextCb.push(() => {
-      if (!window.Ya?.Context?.AdvManager) return;
+    const interval = setInterval(() => {
+      attempts += 1;
 
-      window.Ya.Context.AdvManager.render({
-        blockId: "R-A-19145977-1",
-        renderTo: renderId,
-      });
-    });
+      if (
+        window.Ya &&
+        window.Ya.Context &&
+        window.Ya.Context.AdvManager
+      ) {
+        clearInterval(interval);
+
+        try {
+          window.Ya.Context.AdvManager.render({
+            blockId: "R-A-19145977-1",
+            renderTo: renderId,
+          });
+        } catch (error) {
+          console.error("Yandex RTB render error:", error);
+        }
+      }
+
+      // перестаём пытаться через 15 секунд
+      if (attempts > 30) {
+        clearInterval(interval);
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
   }, [renderId]);
 
   if (!ADS_ENABLED) return null;
