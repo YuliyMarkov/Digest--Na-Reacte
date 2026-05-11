@@ -5,6 +5,7 @@ import ReelsSection from "../components/ReelsSection";
 import MoreNews from "../components/MoreNews";
 import AdBlock from "../components/AdBlock";
 import { useLanguage } from "../context/useLanguage";
+import YandexAdBlock from "../components/YandexAdBlock";
 import Seo from "../components/Seo";
 
 const API_BASE_URL = "https://digest-news.uz";
@@ -127,13 +128,13 @@ function HomePage({ onOpenReel }) {
         loading={loading}
       />
 
-      <AdBlock type="news" />
+      <YandexAdBlock />
 
       <NewsFeed articles={newsFeedArticles} error={componentError} />
 
       <ReelsSection onOpenReel={onOpenReel} />
 
-      <AdBlock type="news" />
+      <YandexAdBlock />
 
       <MoreNews articles={moreNewsArticles} error={componentError} />
     </main>
