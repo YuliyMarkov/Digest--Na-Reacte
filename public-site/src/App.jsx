@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import Loader from "./components/Loader";
+import YandexFullscreenAd from "./components/YandexFullscreenAd";
 
 const TopWidgets = lazy(() => import("./components/TopWidgets"));
 const ReelsModal = lazy(() => import("./components/ReelsModal"));
@@ -67,6 +68,8 @@ function App() {
 
   return (
     <>
+      <YandexFullscreenAd />
+
       <ScrollToTop />
       <Header />
 
