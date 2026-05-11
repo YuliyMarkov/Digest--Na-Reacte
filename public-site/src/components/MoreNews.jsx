@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../context/useLanguage";
+import YandexFeedAd from "./YandexFeedAd";
 
 const batchSize = 4;
 
@@ -50,35 +51,39 @@ function MoreNews({ articles = [], error = "" }) {
       ) : (
         <>
           <div className="more-news-grid">
-            {visibleNews.map((article) => {
+            {visibleNews.map((article, index) => {
               const title = article.translation?.title || article.slug;
               const seoTitle = article.translation?.seoTitle?.trim() || "";
               const alt = seoTitle || title;
               const text = article.translation?.excerpt || "";
 
               return (
-                <article className="more-news-card" key={article.id}>
-                  <Link
-                    to={`/${language}/news/${article.slug}`}
-                    className="more-news-card-link"
-                    title={alt}
-                  >
-                    {article.coverImage && (
-                      <img
-                        src={article.coverImage}
-                        alt={alt}
-                        loading="lazy"
-                        decoding="async"
-                        fetchPriority="low"
-                        width="800"
-                        height="450"
-                      />
-                    )}
+                <Fragment key={article.id}>
+                  <article className="more-news-card">
+                    <Link
+                      to={`/${language}/news/${article.slug}`}
+                      className="more-news-card-link"
+                      title={alt}
+                    >
+                      {article.coverImage && (
+                        <img
+                          src={article.coverImage}
+                          alt={alt}
+                          loading="lazy"
+                          decoding="async"
+                          fetchPriority="low"
+                          width="800"
+                          height="450"
+                        />
+                      )}
 
-                    <h3>{title}</h3>
-                    <p>{text}</p>
-                  </Link>
-                </article>
+                      <h3>{title}</h3>
+                      <p>{text}</p>
+                    </Link>
+                  </article>
+
+                  {index === 3 && <YandexFeedAd />}
+                </Fragment>
               );
             })}
           </div>
