@@ -95,7 +95,8 @@ function HomePage({ onOpenReel }) {
     const uzbekistanIds = new Set(newsFeedArticles.map((article) => article.id));
 
     const moreNewsArticles = nonFeatured.filter(
-      (article) => !featuredIds.has(article.id) && !uzbekistanIds.has(article.id),
+      (article) =>
+        !featuredIds.has(article.id) && !uzbekistanIds.has(article.id),
     );
 
     return {

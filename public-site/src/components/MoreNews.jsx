@@ -82,7 +82,7 @@ function MoreNews({ articles = [], error = "" }) {
                     </Link>
                   </article>
 
-                  {index === 3 && <YandexFeedAd />}
+                  {index === 2 && <YandexFeedAd />}
                 </Fragment>
               );
             })}

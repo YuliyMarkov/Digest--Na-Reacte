@@ -3599,3 +3599,19 @@ body.dark-theme .not-found-img.dark {
 .article-main .rich-text-content blockquote p {
   margin: 0;
 }
+
+.yandex-feed-card {
+  min-height: 390px;
+}
+
+.yandex-feed-card-inner {
+  width: 100%;
+  min-height: 390px;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.yandex-feed-card iframe {
+  width: 100% !important;
+  max-width: 100% !important;
+}

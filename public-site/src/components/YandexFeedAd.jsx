@@ -4,10 +4,7 @@ const ADS_ENABLED = true;
 const BLOCK_ID = "R-A-19145977-5";
 
 function YandexFeedAd({ className = "" }) {
-  const reactId = useId()
-    .replace(/:/g, "")
-    .replace(/_/g, "")
-    .replace(/-/g, "");
+  const reactId = useId().replace(/:/g, "").replace(/_/g, "").replace(/-/g, "");
 
   const renderId = `yandex_feed_${reactId}`;
 
@@ -40,8 +37,10 @@ function YandexFeedAd({ className = "" }) {
   if (!ADS_ENABLED) return null;
 
   return (
-    <article className={`news-card yandex-feed-card ${className}`.trim()}>
-      <div id={renderId}></div>
+    <article className={`more-news-card yandex-feed-card ${className}`.trim()}>
+      <div className="yandex-feed-card-inner">
+        <div id={renderId}></div>
+      </div>
     </article>
   );
 }
