@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useLanguage } from "../context/useLanguage";
 import AdBlock from "../components/AdBlock";
 import Loader from "../components/Loader";
+import YandexAdBlock from "../components/YandexAdBlock";
 import Seo from "../components/Seo";
 
 const API_BASE_URL = "https://digest-news.uz";
@@ -791,7 +792,7 @@ function NewsPage() {
               <YoutubeVideoEmbed url={youtubeEmbedUrl} title={localizedTitle} />
             )}
 
-            <AdBlock type="news" className="article-inline-ad" />
+            <YandexAdBlock />
 
             <div className="article-extra">
               <section className="article-reactions" aria-label="Реакции">
@@ -943,7 +944,7 @@ function NewsPage() {
         </div>
       </section>
 
-      <AdBlock type="news" />
+      <YandexAdBlock />
       
       <section className="more-news-section">
         <div className="news-feed-header">

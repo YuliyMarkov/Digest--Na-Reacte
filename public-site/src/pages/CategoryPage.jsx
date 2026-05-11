@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useLanguage } from "../context/useLanguage";
 import AdBlock from "../components/AdBlock";
 import Loader from "../components/Loader";
+import YandexAdBlock from "../components/YandexAdBlock";
 import Seo from "../components/Seo";
 
 const API_BASE_URL = "https://digest-news.uz";
@@ -175,7 +176,7 @@ function CategoryPage() {
           <h1>{pageTitle}</h1>
         </div>
 
-        <AdBlock type="news" />
+        <YandexAdBlock />
 
         {error ? (
           <div className="category-empty-state">
@@ -234,7 +235,7 @@ function CategoryPage() {
         )}
       </section>
 
-      <AdBlock type="news" />
+      <YandexAdBlock />
     </main>
   );
 }

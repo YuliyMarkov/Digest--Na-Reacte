@@ -4,6 +4,7 @@ import { useLanguage } from '../context/useLanguage'
 import Loader from '../components/Loader'
 import Seo from '../components/Seo'
 import AdBlock from '../components/AdBlock'
+import YandexAdBlock from "../components/YandexAdBlock";
 
 const API_BASE_URL = 'https://digest-news.uz'
 
@@ -139,7 +140,7 @@ function SearchPage() {
           </h1>
         </div>
 
-        <AdBlock />
+        <YandexAdBlock />
 
         {!query ? (
           <div className="category-empty-state">
