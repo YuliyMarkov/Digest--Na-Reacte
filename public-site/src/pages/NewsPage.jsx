@@ -564,7 +564,10 @@ function NewsPage() {
   }, [localizedContentHtml]);
 
   const categorySlug = article?.category?.slug || "uzbekistan";
-  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const shareUrl =
+    typeof window !== "undefined"
+      ? `https://digest-news.uz/${language}/news/${slug}`
+      : `https://digest-news.uz/${language}/news/${slug}`;
   const shareTitle = localizedSeoTitle || localizedTitle;
 
   const shareLinks = {
