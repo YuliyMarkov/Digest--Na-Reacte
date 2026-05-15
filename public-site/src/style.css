@@ -758,6 +758,14 @@ body.dark-theme .latest-news-box li:hover {
   min-height: 340px;
 }
 
+.top-news-slider--fallback {
+  grid-template-columns: 1fr;
+}
+
+.top-news-slider--fallback .top-news-viewport {
+  grid-column: 1 / -1;
+}
+
 .top-news-viewport {
   overflow: hidden;
   width: 100%;

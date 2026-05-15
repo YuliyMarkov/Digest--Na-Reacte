@@ -55,7 +55,7 @@ function TopNews({
   const sidebarArticles = useMemo(
     () => latestArticles.slice(0, 8),
     [latestArticles]
-  );
+  ); 
 
   useEffect(() => {
     if (sliderArticles.length <= 1) return;
@@ -67,21 +67,27 @@ function TopNews({
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [sliderArticles]);
+  }, [sliderArticles.length]);
 
   const goToPrev = () => {
+    if (sliderArticles.length <= 1) return;
+
     setCurrentIndex((prev) =>
       prev === 0 ? sliderArticles.length - 1 : prev - 1
     );
   };
 
   const goToNext = () => {
+    if (sliderArticles.length <= 1) return;
+
     setCurrentIndex((prev) =>
       prev === sliderArticles.length - 1 ? 0 : prev + 1
     );
   };
 
   const handleTouchStart = (event) => {
+    if (sliderArticles.length <= 1) return;
+
     startXRef.current = event.touches[0].clientX;
     deltaXRef.current = 0;
   };
@@ -120,7 +126,7 @@ function TopNews({
               <p>{t.error}</p>
             </div>
           ) : shouldShowFallbackHero ? (
-            <div className="top-news-slider">
+            <div className="top-news-slider top-news-slider--fallback">
               <div className="top-news-viewport">
                 <article className="top-slide">
                   <div className="top-slide-link" aria-hidden="true">
@@ -147,14 +153,16 @@ function TopNews({
           ) : (
             <>
               <div className="top-news-slider">
-                <button
-                  type="button"
-                  className="slider-btn prev"
-                  onClick={goToPrev}
-                  aria-label={t.prev}
-                >
-                  ‹
-                </button>
+                {sliderArticles.length > 1 && (
+                  <button
+                    type="button"
+                    className="slider-btn prev"
+                    onClick={goToPrev}
+                    aria-label={t.prev}
+                  >
+                    ‹
+                  </button>
+                )}
 
                 <div
                   className="top-news-viewport"
@@ -166,10 +174,7 @@ function TopNews({
                     className="top-news-track"
                     ref={trackRef}
                     style={{
-                      transform:
-                        currentIndex === 0
-                          ? "translateX(0)"
-                          : `translateX(-${currentIndex * 100}%)`,
+                      transform: `translateX(-${currentIndex * 100}%)`,
                     }}
                   >
                     {sliderArticles.map((article, index) => {
@@ -206,14 +211,16 @@ function TopNews({
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  className="slider-btn next"
-                  onClick={goToNext}
-                  aria-label={t.next}
-                >
-                  ›
-                </button>
+                {sliderArticles.length > 1 && (
+                  <button
+                    type="button"
+                    className="slider-btn next"
+                    onClick={goToNext}
+                    aria-label={t.next}
+                  >
+                    ›
+                  </button>
+                )}
               </div>
 
               {sliderArticles.length > 1 && (
