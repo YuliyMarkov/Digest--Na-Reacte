@@ -1,9 +1,11 @@
 import fs from "fs/promises";
 import path from "path";
+import http from "http";
 import puppeteer from "puppeteer";
 
-const SITE_URL = "https://digest-news.uz";
 const DIST_DIR = path.resolve("dist");
+const PORT = 4177;
+const LOCAL_URL = `http://127.0.0.1:${PORT}`;
 
 const routes = [
   "/ru",
@@ -24,12 +26,67 @@ const routes = [
   "/uz/category/economy",
 ];
 
+const mimeTypes = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
+};
+
+async function fileExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function startServer() {
+  const server = http.createServer(async (req, res) => {
+    try {
+      const url = new URL(req.url, LOCAL_URL);
+      let pathname = decodeURIComponent(url.pathname);
+
+      if (pathname.endsWith("/")) {
+        pathname += "index.html";
+      }
+
+      let filePath = path.join(DIST_DIR, pathname);
+
+      if (!(await fileExists(filePath))) {
+        filePath = path.join(DIST_DIR, "index.html");
+      }
+
+      const ext = path.extname(filePath);
+      const contentType = mimeTypes[ext] || "application/octet-stream";
+      const content = await fs.readFile(filePath);
+
+      res.writeHead(200, { "Content-Type": contentType });
+      res.end(content);
+    } catch {
+      res.writeHead(500);
+      res.end("Server error");
+    }
+  });
+
+  return new Promise((resolve) => {
+    server.listen(PORT, "127.0.0.1", () => resolve(server));
+  });
+}
+
 async function ensureDir(dir) {
   await fs.mkdir(dir, { recursive: true });
 }
 
 async function saveHtml(route, html) {
-  const cleanRoute = route.replace(/^\/+/, "");
+  const cleanRoute = route.replace(/^\/+/, "").replace(/\/+$/, "");
   const outputDir = path.join(DIST_DIR, cleanRoute);
   const outputPath = path.join(outputDir, "index.html");
 
@@ -40,6 +97,8 @@ async function saveHtml(route, html) {
 }
 
 async function prerender() {
+  const server = await startServer();
+
   const browser = await puppeteer.launch({
     headless: "new",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -48,6 +107,25 @@ async function prerender() {
   try {
     const page = await browser.newPage();
 
+    await page.setRequestInterception(true);
+
+    page.on("request", (request) => {
+      const url = request.url();
+
+      if (
+        url.includes("yandex.ru/ads") ||
+        url.includes("mc.yandex.ru") ||
+        url.includes("googletagmanager.com") ||
+        url.includes("googlesyndication.com") ||
+        url.includes("google-analytics.com")
+      ) {
+        request.abort();
+        return;
+      }
+
+      request.continue();
+    });
+
     await page.setViewport({
       width: 1366,
       height: 900,
@@ -55,9 +133,9 @@ async function prerender() {
     });
 
     for (const route of routes) {
-      const url = `${SITE_URL}${route}`;
+      const url = `${LOCAL_URL}${route}`;
 
-      console.log(`Prerendering: ${url}`);
+      console.log(`Prerendering: ${route}`);
 
       try {
         await page.goto(url, {
@@ -80,6 +158,7 @@ async function prerender() {
     }
   } finally {
     await browser.close();
+    server.close();
   }
 }
 
