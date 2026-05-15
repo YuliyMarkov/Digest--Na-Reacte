@@ -4,10 +4,14 @@ import http from "http";
 import puppeteer from "puppeteer";
 
 const DIST_DIR = path.resolve("dist");
+const NEWS_SITEMAP_PATH = path.resolve("public/news-sitemap.xml");
+
 const PORT = 4177;
 const LOCAL_URL = `http://127.0.0.1:${PORT}`;
 
-const routes = [
+const MAX_NEWS_ARTICLES = 50;
+
+const baseRoutes = [
   "/ru",
   "/uz",
 
@@ -24,6 +28,16 @@ const routes = [
   "/uz/category/incidents",
   "/uz/category/science",
   "/uz/category/economy",
+];
+
+const blockedHosts = [
+  "yandex.ru/ads",
+  "yastatic.net/safeframe",
+  "mc.yandex.ru",
+  "googletagmanager.com",
+  "googlesyndication.com",
+  "google-analytics.com",
+  "doubleclick.net",
 ];
 
 const mimeTypes = {
@@ -81,6 +95,29 @@ function startServer() {
   });
 }
 
+async function readFreshNewsRoutes() {
+  try {
+    const xml = await fs.readFile(NEWS_SITEMAP_PATH, "utf8");
+
+    const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)]
+      .map((match) => match[1])
+      .filter(Boolean)
+      .map((url) => {
+        try {
+          return new URL(url).pathname;
+        } catch {
+          return "";
+        }
+      })
+      .filter((pathname) => pathname.includes("/news/"));
+
+    return [...new Set(urls)].slice(0, MAX_NEWS_ARTICLES);
+  } catch (error) {
+    console.warn("Could not read news sitemap:", error.message);
+    return [];
+  }
+}
+
 async function ensureDir(dir) {
   await fs.mkdir(dir, { recursive: true });
 }
@@ -96,7 +133,22 @@ async function saveHtml(route, html) {
   console.log(`Saved: ${outputPath}`);
 }
 
+function cleanHtml(html) {
+  return html
+    .replace(/<script[^>]+src="https:\/\/yandex\.ru\/ads\/system\/context\.js"[^>]*><\/script>/gi, "")
+    .replace(/<script[^>]+src="https:\/\/pagead2\.googlesyndication\.com[^"]*"[^>]*><\/script>/gi, "")
+    .replace(/<script[^>]+src="https:\/\/www\.googletagmanager\.com[^"]*"[^>]*><\/script>/gi, "")
+    .replace(/<script[^>]+src="https:\/\/mc\.yandex\.ru[^"]*"[^>]*><\/script>/gi, "")
+    .replace(/<div[^>]*id="yandex_rtb[^"]*"[\s\S]*?<\/div><\/section>/gi, "</section>");
+}
+
 async function prerender() {
+  const newsRoutes = await readFreshNewsRoutes();
+  const routes = [...new Set([...baseRoutes, ...newsRoutes])];
+
+  console.log(`Routes to prerender: ${routes.length}`);
+  console.log(`Fresh news routes: ${newsRoutes.length}`);
+
   const server = await startServer();
 
   const browser = await puppeteer.launch({
@@ -112,13 +164,7 @@ async function prerender() {
     page.on("request", (request) => {
       const url = request.url();
 
-      if (
-        url.includes("yandex.ru/ads") ||
-        url.includes("mc.yandex.ru") ||
-        url.includes("googletagmanager.com") ||
-        url.includes("googlesyndication.com") ||
-        url.includes("google-analytics.com")
-      ) {
+      if (blockedHosts.some((host) => url.includes(host))) {
         request.abort();
         return;
       }
@@ -149,7 +195,7 @@ async function prerender() {
 
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
-        const html = await page.content();
+        const html = cleanHtml(await page.content());
 
         await saveHtml(route, html);
       } catch (error) {
