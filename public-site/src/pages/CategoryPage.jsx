@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useLanguage } from "../context/useLanguage";
-import AdBlock from "../components/AdBlock";
 import Loader from "../components/Loader";
 import YandexAdBlock from "../components/YandexAdBlock";
 import Seo from "../components/Seo";
@@ -15,11 +14,11 @@ function CategoryPage() {
 
   const titles = {
     ru: {
-      uzbekistan: "Узбекистан",
-      world: "Мир",
-      auto: "Авто",
+      uzbekistan: "Новости Узбекистана",
+      world: "Новости мира",
+      auto: "Авто новости",
       incidents: "Происшествия",
-      science: "Наука",
+      science: "Наука и технологии",
       economy: "Экономика",
       default: "Категория",
       allNews: "Все новости",
@@ -27,20 +26,22 @@ function CategoryPage() {
       loadMore: "Больше новостей",
       error: "Не удалось загрузить новости.",
       empty: "В этой категории пока нет новостей.",
+      home: "Главная",
     },
     uz: {
-      uzbekistan: "O‘zbekiston",
-      world: "Dunyo",
-      auto: "Avto",
+      uzbekistan: "O‘zbekiston yangiliklari",
+      world: "Dunyo yangiliklari",
+      auto: "Avto yangiliklar",
       incidents: "Hodisalar",
-      science: "Fan",
-      economy: "Iqtisod",
+      science: "Fan va texnologiyalar",
+      economy: "Iqtisodiyot",
       default: "Kategoriya",
       allNews: "Barcha yangiliklar",
       showMore: "Yana ko‘rish",
       loadMore: "Ko‘proq yangilik",
       error: "Yangiliklarni yuklab bo‘lmadi.",
       empty: "Bu kategoriyada hozircha yangiliklar yo‘q.",
+      home: "Bosh sahifa",
     },
   };
 
@@ -55,7 +56,7 @@ function CategoryPage() {
       incidents:
         "Происшествия: ДТП, чрезвычайные ситуации, криминальные сводки и важные события.",
       science:
-        "Новости науки: технологии, открытия, исследования и главные научные события.",
+        "Новости науки и технологий: открытия, исследования, инновации и главные научные события.",
       economy:
         "Новости экономики: финансы, бизнес, рынок и экономические изменения в Узбекистане и мире.",
       default:
@@ -67,11 +68,11 @@ function CategoryPage() {
       world:
         "Dunyo yangiliklari: xalqaro voqealar, siyosat, iqtisodiyot va muhim hodisalar.",
       auto:
-        "Avto yangiliklar: yangi modelllar, bozor o‘zgarishlari, sharhlar va avtomobil sohasidagi voqealar.",
+        "Avto yangiliklar: yangi modellar, bozor o‘zgarishlari, sharhlar va avtomobil sohasidagi voqealar.",
       incidents:
         "Hodisalar: YTH, favqulodda holatlar, jinoyat xabarlari va muhim voqealar.",
       science:
-        "Fan yangiliklari: texnologiyalar, kashfiyotlar, tadqiqotlar va ilmiy voqealar.",
+        "Fan va texnologiya yangiliklari: kashfiyotlar, tadqiqotlar, innovatsiyalar va ilmiy voqealar.",
       economy:
         "Iqtisodiyot yangiliklari: moliya, biznes, bozor va iqtisodiy o‘zgarishlar.",
       default:
@@ -81,10 +82,51 @@ function CategoryPage() {
 
   const t = titles[language] || titles.ru;
   const pageTitle = t[slug] || t.default;
+
   const seoDescription =
     seoDescriptions[language]?.[slug] || seoDescriptions[language]?.default;
+
   const canonical = `/${language}/category/${slug}`;
+  const alternateRu = `/ru/category/${slug}`;
+  const alternateUz = `/uz/category/${slug}`;
   const locale = language === "uz" ? "uz_UZ" : "ru_RU";
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": "__PAGE_URL__#collection",
+        url: "__PAGE_URL__",
+        name: pageTitle,
+        description: seoDescription,
+        inLanguage: language === "uz" ? "uz-UZ" : "ru-RU",
+        isPartOf: {
+          "@type": "WebSite",
+          "@id": "https://digest-news.uz/#website",
+          name: "Дайджест",
+          url: "https://digest-news.uz",
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: t.home,
+            item: `https://digest-news.uz/${language}`,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: pageTitle,
+            item: "__PAGE_URL__",
+          },
+        ],
+      },
+    ],
+  };
 
   const [articles, setArticles] = useState([]);
   const [visibleCount, setVisibleCount] = useState(batchSize);
@@ -153,8 +195,11 @@ function CategoryPage() {
           title={pageTitle}
           description={seoDescription}
           canonical={canonical}
+          alternateRu={alternateRu}
+          alternateUz={alternateUz}
           type="website"
           locale={locale}
+          schema={schema}
         />
         <Loader />
       </main>
@@ -167,13 +212,21 @@ function CategoryPage() {
         title={pageTitle}
         description={seoDescription}
         canonical={canonical}
+        alternateRu={alternateRu}
+        alternateUz={alternateUz}
         type="website"
         locale={locale}
+        schema={schema}
       />
 
       <section className="category-news-section">
+        <div className="breadcrumbs">
+          <Link to={`/${language}`}>{t.home}</Link> / <span>{pageTitle}</span>
+        </div>
+
         <div className="category-header">
           <h1>{pageTitle}</h1>
+          <p>{seoDescription}</p>
         </div>
 
         <YandexAdBlock />

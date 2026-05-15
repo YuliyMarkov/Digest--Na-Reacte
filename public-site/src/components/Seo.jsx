@@ -3,7 +3,9 @@ import { Helmet } from "react-helmet-async";
 function Seo({
   title = "Дайджест — новости Узбекистана",
   description = "Свежие новости Узбекистана и мира.",
-  canonical = "",  
+  canonical = "",
+  alternateRu = "",
+  alternateUz = "",
   type = "website",
   schema = null,
   locale = "ru_RU",
@@ -24,6 +26,19 @@ function Seo({
     typeof description === "string" && description.trim()
       ? description.trim()
       : "Свежие новости Узбекистана и мира.";
+
+  const safeCanonical =
+    typeof canonical === "string" && canonical.trim() ? canonical.trim() : "";
+
+  const safeAlternateRu =
+    typeof alternateRu === "string" && alternateRu.trim()
+      ? alternateRu.trim()
+      : "";
+
+  const safeAlternateUz =
+    typeof alternateUz === "string" && alternateUz.trim()
+      ? alternateUz.trim()
+      : "";
 
   const safeImage = "/preview.jpg";
 
@@ -49,43 +64,56 @@ function Seo({
     ? safeTitle
     : `${safeTitle} — Дайджест`;
 
-  const fullUrl = canonical ? `${siteUrl}${canonical}` : siteUrl;
+  const buildFullUrl = (path) => {
+    if (!path) return "";
+    if (path.startsWith("http")) return path;
+    return `${siteUrl}${path.startsWith("/") ? path : `/${path}`}`;
+  };
+
+  const fullUrl = safeCanonical ? buildFullUrl(safeCanonical) : siteUrl;
+  const fullAlternateRu = safeAlternateRu ? buildFullUrl(safeAlternateRu) : "";
+  const fullAlternateUz = safeAlternateUz ? buildFullUrl(safeAlternateUz) : "";
 
   const fullImage = safeImage.startsWith("http")
     ? safeImage
     : `${siteUrl}${safeImage}`;
 
   const fullPreloadImage = safePreloadImage
-    ? safePreloadImage.startsWith("http")
-      ? safePreloadImage
-      : `${siteUrl}${safePreloadImage}`
+    ? buildFullUrl(safePreloadImage)
     : "";
 
   const normalizedSchema = schema
     ? JSON.parse(
-        JSON.stringify(schema).replaceAll('"__PAGE_URL__"', `"${fullUrl}"`),
+        JSON.stringify(schema)
+          .replaceAll('"__PAGE_URL__"', `"${fullUrl}"`)
+          .replaceAll("__PAGE_URL__", fullUrl)
       )
     : null;
 
+  const htmlLang = locale === "uz_UZ" ? "uz" : "ru";
+  const alternateLocale = locale === "uz_UZ" ? "ru_RU" : "uz_UZ";
+
   return (
     <Helmet>
-      <html lang={locale === "uz_UZ" ? "uz" : "ru"} />
+      <html lang={htmlLang} />
 
       <title>{fullTitle}</title>
 
       <meta name="description" content={safeDescription} />
-      <meta name="robots" content="index,follow" />
+      <meta name="robots" content="index,follow,max-image-preview:large" />
 
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={safeDescription} />
       <meta property="og:type" content={type} />
       <meta property="og:url" content={fullUrl} />
       <meta property="og:image" content={fullImage} />
+      <meta property="og:image:secure_url" content={fullImage} />
       <meta property="og:image:alt" content={fullTitle} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:site_name" content={siteName} />
       <meta property="og:locale" content={locale} />
+      <meta property="og:locale:alternate" content={alternateLocale} />
 
       {type === "article" && safePublishedTime && (
         <meta property="article:published_time" content={safePublishedTime} />
@@ -107,6 +135,18 @@ function Seo({
       <meta name="twitter:url" content={fullUrl} />
 
       <link rel="canonical" href={fullUrl} />
+
+      {fullAlternateRu && (
+        <link rel="alternate" hrefLang="ru" href={fullAlternateRu} />
+      )}
+
+      {fullAlternateUz && (
+        <link rel="alternate" hrefLang="uz" href={fullAlternateUz} />
+      )}
+
+      {fullAlternateRu && (
+        <link rel="alternate" hrefLang="x-default" href={fullAlternateRu} />
+      )}
 
       {fullPreloadImage && (
         <link

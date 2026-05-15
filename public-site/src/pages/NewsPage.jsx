@@ -251,7 +251,7 @@ function TelegramPostEmbed({ url }) {
     script.src = "https://telegram.org/js/telegram-widget.js?22";
     script.setAttribute(
       "data-telegram-post",
-      `${embedData.channel}/${embedData.postId}`,
+      `${embedData.channel}/${embedData.postId}`
     );
     script.setAttribute("data-width", "100%");
     script.setAttribute("data-userpic", "true");
@@ -358,8 +358,8 @@ function NewsPage() {
 
         const response = await fetch(
           `${API_BASE_URL}/api/articles/${encodeURIComponent(
-            slug,
-          )}?lang=${encodeURIComponent(language)}`,
+            slug
+          )}?lang=${encodeURIComponent(language)}`
         );
 
         const data = await response.json();
@@ -408,7 +408,7 @@ function NewsPage() {
         setSidebarLoading(true);
 
         const response = await fetch(
-          `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`,
+          `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`
         );
         const data = await response.json();
 
@@ -460,8 +460,8 @@ function NewsPage() {
         if (searchQuery) {
           const response = await fetch(
             `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(
-              language,
-            )}&search=${encodeURIComponent(searchQuery)}`,
+              language
+            )}&search=${encodeURIComponent(searchQuery)}`
           );
 
           const data = await response.json();
@@ -474,8 +474,8 @@ function NewsPage() {
         if (currentCategorySlug) {
           const response = await fetch(
             `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(
-              language,
-            )}&category=${encodeURIComponent(currentCategorySlug)}`,
+              language
+            )}&category=${encodeURIComponent(currentCategorySlug)}`
           );
 
           const data = await response.json();
@@ -487,7 +487,7 @@ function NewsPage() {
 
         if (searchResults.length < 6 || categoryResults.length < 6) {
           const response = await fetch(
-            `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`,
+            `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`
           );
 
           const data = await response.json();
@@ -499,21 +499,21 @@ function NewsPage() {
 
         const filteredSearch = searchResults.filter(
           (item) =>
-            item.slug !== slug && item.category?.slug === currentCategorySlug,
+            item.slug !== slug && item.category?.slug === currentCategorySlug
         );
 
         const filteredCategory = categoryResults.filter(
-          (item) => item.slug !== slug,
+          (item) => item.slug !== slug
         );
 
         const filteredLatest = latestResults.filter(
-          (item) => item.slug !== slug,
+          (item) => item.slug !== slug
         );
 
         const merged = mergeUniqueArticles(
           filteredSearch,
           filteredCategory,
-          filteredLatest,
+          filteredLatest
         ).slice(0, 6);
 
         if (isMounted) {
@@ -539,7 +539,7 @@ function NewsPage() {
     if (!article?.id) return;
 
     const savedReaction = localStorage.getItem(
-      `reaction_article_${article.id}`,
+      `reaction_article_${article.id}`
     );
     if (savedReaction) {
       setSelectedReaction(savedReaction);
@@ -569,13 +569,13 @@ function NewsPage() {
 
   const shareLinks = {
     telegram: `https://t.me/share/url?url=${encodeURIComponent(
-      shareUrl,
+      shareUrl
     )}&text=${encodeURIComponent(shareTitle)}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-      shareUrl,
+      shareUrl
     )}`,
     threads: `https://www.threads.net/intent/post?text=${encodeURIComponent(
-      `${shareTitle} ${shareUrl}`,
+      `${shareTitle} ${shareUrl}`
     )}`,
   };
 
@@ -592,9 +592,17 @@ function NewsPage() {
 
   const seoTitle = localizedSeoTitle || localizedTitle || t.notFoundTitle;
   const canonical = `/${language}/news/${slug}`;
+  const alternateRu = `/ru/news/${slug}`;
+  const alternateUz = `/uz/news/${slug}`;
 
   const publishedDateIso = article?.publishedAt || null;
   const modifiedDateIso = article?.updatedAt || publishedDateIso || null;
+
+  const articleImage = article?.coverImage
+    ? article.coverImage.startsWith("http")
+      ? article.coverImage
+      : `https://digest-news.uz${article.coverImage}`
+    : "";
 
   const schemaKeywords = extractSearchQuery(localizedTitle)
     .split(" ")
@@ -603,39 +611,68 @@ function NewsPage() {
   const schema = article
     ? {
         "@context": "https://schema.org",
-        "@type": "NewsArticle",
-        headline: seoTitle,
-        description: seoDescription,
-        image: article.coverImage
-          ? [
-              article.coverImage.startsWith("http")
-                ? article.coverImage
-                : `https://digest-news.uz${article.coverImage}`,
-            ]
-          : [],
-        ...(publishedDateIso ? { datePublished: publishedDateIso } : {}),
-        ...(modifiedDateIso ? { dateModified: modifiedDateIso } : {}),
-        author: {
-          "@type": "Organization",
-          name: "Дайджест",
-        },
-        publisher: {
-          "@type": "Organization",
-          name: "Дайджест",
-          logo: {
-            "@type": "ImageObject",
-            url: "https://digest-news.uz/New_Logo.png",
+        "@graph": [
+          {
+            "@type": "NewsArticle",
+            headline: seoTitle,
+            description: seoDescription,
+            url: "__PAGE_URL__",
+            image: articleImage ? [articleImage] : [],
+            thumbnailUrl: articleImage || undefined,
+
+            ...(publishedDateIso ? { datePublished: publishedDateIso } : {}),
+            ...(modifiedDateIso ? { dateModified: modifiedDateIso } : {}),
+
+            author: {
+              "@type": "Organization",
+              name: "Дайджест",
+            },
+
+            publisher: {
+              "@type": "Organization",
+              name: "Дайджест",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://digest-news.uz/New_Logo.png",
+              },
+            },
+
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": "__PAGE_URL__",
+            },
+
+            isAccessibleForFree: true,
+            articleSection: localizedCategory || undefined,
+            inLanguage: language === "uz" ? "uz-UZ" : "ru-RU",
+            genre: ["News"],
+            keywords: schemaKeywords.length > 0 ? schemaKeywords : undefined,
+            articleBody: plainTextContent?.slice(0, 5000) || undefined,
           },
-        },
-        mainEntityOfPage: {
-          "@type": "WebPage",
-          "@id": "__PAGE_URL__",
-        },
-        isAccessibleForFree: true,
-        articleSection: localizedCategory || undefined,
-        inLanguage: language === "uz" ? "uz-UZ" : "ru-RU",
-        genre: ["News"],
-        keywords: schemaKeywords.length > 0 ? schemaKeywords : undefined,
+          {
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: t.home,
+                item: `https://digest-news.uz/${language}`,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: localizedCategory,
+                item: `https://digest-news.uz/${language}/category/${categorySlug}`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: localizedTitle,
+                item: "__PAGE_URL__",
+              },
+            ],
+          },
+        ],
       }
     : null;
 
@@ -666,7 +703,7 @@ function NewsPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ type }),
-        },
+        }
       );
 
       const data = await response.json();
@@ -708,6 +745,8 @@ function NewsPage() {
           title={t.notFoundTitle}
           description={t.notFoundText}
           canonical={`/${language}/news/${slug}`}
+          alternateRu={`/ru/news/${slug}`}
+          alternateUz={`/uz/news/${slug}`}
           type="article"
           locale={locale}
         />
@@ -728,6 +767,8 @@ function NewsPage() {
           title={t.notFoundTitle}
           description={t.loadError}
           canonical={`/${language}/news/${slug}`}
+          alternateRu={`/ru/news/${slug}`}
+          alternateUz={`/uz/news/${slug}`}
           type="article"
           locale={locale}
           publishedTime={publishedDateIso || ""}
@@ -750,10 +791,13 @@ function NewsPage() {
         title={seoTitle}
         description={seoDescription}
         canonical={canonical}
+        alternateRu={alternateRu}
+        alternateUz={alternateUz}
         image={article.coverImage || ""}
         type="article"
         schema={schema}
         locale={locale}
+        preloadImage={article.coverImage || ""}
         publishedTime={publishedDateIso || ""}
         modifiedTime={modifiedDateIso || ""}
         section={localizedCategory || ""}
@@ -778,7 +822,15 @@ function NewsPage() {
             <h1>{localizedTitle}</h1>
 
             {article.coverImage && (
-              <img src={article.coverImage} alt={seoTitle || localizedTitle} />
+              <img
+                src={article.coverImage}
+                alt={seoTitle || localizedTitle}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                width="1200"
+                height="630"
+              />
             )}
 
             <div
@@ -901,7 +953,12 @@ function NewsPage() {
                 className="article-telegram-subscribe"
               >
                 <div className="article-telegram-icon">
-                  <img src="/Icons/TG-icon.svg" alt="Telegram" />
+                  <img
+                    src="/Icons/TG-icon.svg"
+                    alt="Telegram"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
 
                 <div className="article-telegram-text">
@@ -945,7 +1002,7 @@ function NewsPage() {
       </section>
 
       <YandexAdBlock />
-      
+
       <section className="more-news-section">
         <div className="news-feed-header">
           <h2>{t.related}</h2>
@@ -972,7 +1029,14 @@ function NewsPage() {
                   title={seoAlt}
                 >
                   {item.coverImage && (
-                    <img src={item.coverImage} alt={seoAlt} />
+                    <img
+                      src={item.coverImage}
+                      alt={seoAlt}
+                      loading="lazy"
+                      decoding="async"
+                      width="600"
+                      height="400"
+                    />
                   )}
                   <h3>{title}</h3>
                   <p>{text}</p>

@@ -33,6 +33,49 @@ function HomePage({ onOpenReel }) {
   const locale = language === "uz" ? "uz_UZ" : "ru_RU";
   const canonical = `/${language}`;
 
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://digest-news.uz/#organization",
+        name: "Дайджест",
+        url: "https://digest-news.uz",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://digest-news.uz/preview.jpg",
+          width: 1200,
+          height: 630,
+        },
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://digest-news.uz/#website",
+        url: "https://digest-news.uz",
+        name: "Дайджест",
+        description: t.description,
+        publisher: {
+          "@id": "https://digest-news.uz/#organization",
+        },
+        inLanguage: language === "uz" ? "uz" : "ru",
+      },
+      {
+        "@type": "WebPage",
+        "@id": "__PAGE_URL__#webpage",
+        url: "__PAGE_URL__",
+        name: t.title,
+        description: t.description,
+        isPartOf: {
+          "@id": "https://digest-news.uz/#website",
+        },
+        about: {
+          "@id": "https://digest-news.uz/#organization",
+        },
+        inLanguage: language === "uz" ? "uz" : "ru",
+      },
+    ],
+  };
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -43,7 +86,7 @@ function HomePage({ onOpenReel }) {
 
         const response = await fetch(
           `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`,
-          { signal: controller.signal },
+          { signal: controller.signal }
         );
 
         const data = await response.json();
@@ -82,7 +125,7 @@ function HomePage({ onOpenReel }) {
     const nonFeatured = articles.filter((article) => !article.isFeatured);
 
     const uzbekistanNews = nonFeatured.filter(
-      (article) => article.category?.slug === "uzbekistan",
+      (article) => article.category?.slug === "uzbekistan"
     );
 
     const featuredArticles =
@@ -96,7 +139,7 @@ function HomePage({ onOpenReel }) {
 
     const moreNewsArticles = nonFeatured.filter(
       (article) =>
-        !featuredIds.has(article.id) && !uzbekistanIds.has(article.id),
+        !featuredIds.has(article.id) && !uzbekistanIds.has(article.id)
     );
 
     return {
@@ -116,9 +159,12 @@ function HomePage({ onOpenReel }) {
         title={t.title}
         description={t.description}
         canonical={canonical}
+        alternateRu="/ru"
+        alternateUz="/uz"
         locale={locale}
         image="/preview.jpg"
         preloadImage={firstImage}
+        schema={schema}
       />
 
       <TopNews
