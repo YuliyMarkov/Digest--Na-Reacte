@@ -251,7 +251,7 @@ function TelegramPostEmbed({ url }) {
     script.src = "https://telegram.org/js/telegram-widget.js?22";
     script.setAttribute(
       "data-telegram-post",
-      `${embedData.channel}/${embedData.postId}`
+      `${embedData.channel}/${embedData.postId}`,
     );
     script.setAttribute("data-width", "100%");
     script.setAttribute("data-userpic", "true");
@@ -358,8 +358,8 @@ function NewsPage() {
 
         const response = await fetch(
           `${API_BASE_URL}/api/articles/${encodeURIComponent(
-            slug
-          )}?lang=${encodeURIComponent(language)}`
+            slug,
+          )}?lang=${encodeURIComponent(language)}`,
         );
 
         const data = await response.json();
@@ -408,7 +408,7 @@ function NewsPage() {
         setSidebarLoading(true);
 
         const response = await fetch(
-          `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`
+          `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`,
         );
         const data = await response.json();
 
@@ -460,8 +460,8 @@ function NewsPage() {
         if (searchQuery) {
           const response = await fetch(
             `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(
-              language
-            )}&search=${encodeURIComponent(searchQuery)}`
+              language,
+            )}&search=${encodeURIComponent(searchQuery)}`,
           );
 
           const data = await response.json();
@@ -474,8 +474,8 @@ function NewsPage() {
         if (currentCategorySlug) {
           const response = await fetch(
             `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(
-              language
-            )}&category=${encodeURIComponent(currentCategorySlug)}`
+              language,
+            )}&category=${encodeURIComponent(currentCategorySlug)}`,
           );
 
           const data = await response.json();
@@ -487,7 +487,7 @@ function NewsPage() {
 
         if (searchResults.length < 6 || categoryResults.length < 6) {
           const response = await fetch(
-            `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`
+            `${API_BASE_URL}/api/articles?lang=${encodeURIComponent(language)}`,
           );
 
           const data = await response.json();
@@ -499,21 +499,21 @@ function NewsPage() {
 
         const filteredSearch = searchResults.filter(
           (item) =>
-            item.slug !== slug && item.category?.slug === currentCategorySlug
+            item.slug !== slug && item.category?.slug === currentCategorySlug,
         );
 
         const filteredCategory = categoryResults.filter(
-          (item) => item.slug !== slug
+          (item) => item.slug !== slug,
         );
 
         const filteredLatest = latestResults.filter(
-          (item) => item.slug !== slug
+          (item) => item.slug !== slug,
         );
 
         const merged = mergeUniqueArticles(
           filteredSearch,
           filteredCategory,
-          filteredLatest
+          filteredLatest,
         ).slice(0, 6);
 
         if (isMounted) {
@@ -539,7 +539,7 @@ function NewsPage() {
     if (!article?.id) return;
 
     const savedReaction = localStorage.getItem(
-      `reaction_article_${article.id}`
+      `reaction_article_${article.id}`,
     );
     if (savedReaction) {
       setSelectedReaction(savedReaction);
@@ -569,13 +569,13 @@ function NewsPage() {
 
   const shareLinks = {
     telegram: `https://t.me/share/url?url=${encodeURIComponent(
-      shareUrl
+      shareUrl,
     )}&text=${encodeURIComponent(shareTitle)}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-      shareUrl
+      shareUrl,
     )}`,
     threads: `https://www.threads.net/intent/post?text=${encodeURIComponent(
-      `${shareTitle} ${shareUrl}`
+      `${shareTitle} ${shareUrl}`,
     )}`,
   };
 
@@ -703,7 +703,7 @@ function NewsPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ type }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -817,6 +817,11 @@ function NewsPage() {
             <div className="article-meta">
               <span className="article-category">{localizedCategory}</span>
               <span className="article-date">{localizedDate}</span>
+              <span className="article-author">
+                {language === "uz"
+                  ? "Dayjest tahririyati"
+                  : "Редакция «Дайджест»"}
+              </span>
             </div>
 
             <h1>{localizedTitle}</h1>

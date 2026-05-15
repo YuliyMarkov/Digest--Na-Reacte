@@ -3628,3 +3628,14 @@ body.dark-theme .not-found-img.dark {
   width: 100% !important;
   max-width: 100% !important;
 }
+
+.article-author {
+  color: #777;
+  font-size: 14px;
+}
+
+.article-author::before {
+  content: "•";
+  margin: 0 8px;
+  color: #aaa;
+}
