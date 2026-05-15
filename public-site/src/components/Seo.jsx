@@ -85,8 +85,8 @@ function Seo({
   const normalizedSchema = schema
     ? JSON.parse(
         JSON.stringify(schema)
-          .replaceAll('"__PAGE_URL__"', `"${fullUrl}"`)
-          .replaceAll("__PAGE_URL__", fullUrl)
+          .replace(/"__PAGE_URL__"/g, `"${fullUrl}"`)
+          .replace(/__PAGE_URL__/g, fullUrl)
       )
     : null;
 
@@ -108,6 +108,7 @@ function Seo({
       <meta property="og:url" content={fullUrl} />
       <meta property="og:image" content={fullImage} />
       <meta property="og:image:secure_url" content={fullImage} />
+      <meta property="og:image:type" content="image/jpeg" />
       <meta property="og:image:alt" content={fullTitle} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
