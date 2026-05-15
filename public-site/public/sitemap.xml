@@ -101,6 +101,30 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://digest-news.uz/ru/news/v-tashkente-usilyat-kontrol-za-narusheniyami-parkovki-avtomobili-narushiteley-budut-evakuirovat-na-shtrafstoyanki</loc>
+    <lastmod>2026-05-15T11:44:01.892Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digest-news.uz/ru/news/v-tashkente-dlya-shkolnikov-ustroyat-grandioznyy-besplatnyy-vypusknoy</loc>
+    <lastmod>2026-05-15T10:55:22.023Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digest-news.uz/ru/news/uchenye-preduprezhdayut-vozmozhny-zasuhi-i-navodneniya-iz-za-moschnogo-el-nino-v-2026-godu</loc>
+    <lastmod>2026-05-15T10:25:51.570Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digest-news.uz/ru/news/s-1-iyunya-v-uzbekistane-vvodyatsya-novye-tarify-na-elektroenergiyu-i-prirodnyy-gaz</loc>
+    <lastmod>2026-05-15T10:12:44.053Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://digest-news.uz/ru/news/v-strategii-molodezh-novogo-uzbekistana-2030-predusmotreny-lgoty-za-znanie-inostrannyh-yazykov</loc>
     <lastmod>2026-05-15T06:03:12.202Z</lastmod>
     <changefreq>daily</changefreq>
@@ -1153,6 +1177,30 @@
   <url>
     <loc>https://digest-news.uz/ru/news/weather-weekend-uzbekistan</loc>
     <lastmod>2026-04-14T07:13:52.151Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digest-news.uz/uz/news/v-tashkente-usilyat-kontrol-za-narusheniyami-parkovki-avtomobili-narushiteley-budut-evakuirovat-na-shtrafstoyanki</loc>
+    <lastmod>2026-05-15T11:44:01.892Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digest-news.uz/uz/news/v-tashkente-dlya-shkolnikov-ustroyat-grandioznyy-besplatnyy-vypusknoy</loc>
+    <lastmod>2026-05-15T10:55:22.023Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digest-news.uz/uz/news/uchenye-preduprezhdayut-vozmozhny-zasuhi-i-navodneniya-iz-za-moschnogo-el-nino-v-2026-godu</loc>
+    <lastmod>2026-05-15T10:25:51.570Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://digest-news.uz/uz/news/s-1-iyunya-v-uzbekistane-vvodyatsya-novye-tarify-na-elektroenergiyu-i-prirodnyy-gaz</loc>
+    <lastmod>2026-05-15T10:12:44.053Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>

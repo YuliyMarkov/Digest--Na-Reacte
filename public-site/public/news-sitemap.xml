@@ -2,6 +2,50 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
+    <loc>https://digest-news.uz/ru/news/v-tashkente-usilyat-kontrol-za-narusheniyami-parkovki-avtomobili-narushiteley-budut-evakuirovat-na-shtrafstoyanki</loc>
+    <news:news>
+      <news:publication>
+        <news:name>Дайджест</news:name>
+        <news:language>ru</news:language>
+      </news:publication>
+      <news:publication_date>2026-05-15T11:44:01.886Z</news:publication_date>
+      <news:title>В Ташкенте усилят контроль за нарушениями парковки: автомобили нарушителей будут эвакуировать на штрафстоянки</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://digest-news.uz/ru/news/v-tashkente-dlya-shkolnikov-ustroyat-grandioznyy-besplatnyy-vypusknoy</loc>
+    <news:news>
+      <news:publication>
+        <news:name>Дайджест</news:name>
+        <news:language>ru</news:language>
+      </news:publication>
+      <news:publication_date>2026-05-15T10:55:22.003Z</news:publication_date>
+      <news:title>В Ташкенте для школьников устроят грандиозный бесплатный выпускной</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://digest-news.uz/ru/news/uchenye-preduprezhdayut-vozmozhny-zasuhi-i-navodneniya-iz-za-moschnogo-el-nino-v-2026-godu</loc>
+    <news:news>
+      <news:publication>
+        <news:name>Дайджест</news:name>
+        <news:language>ru</news:language>
+      </news:publication>
+      <news:publication_date>2026-05-15T10:25:51.561Z</news:publication_date>
+      <news:title>Учёные предупреждают: возможны засухи и наводнения из-за мощного Эль-Ниньо в 2026 году</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://digest-news.uz/ru/news/s-1-iyunya-v-uzbekistane-vvodyatsya-novye-tarify-na-elektroenergiyu-i-prirodnyy-gaz</loc>
+    <news:news>
+      <news:publication>
+        <news:name>Дайджест</news:name>
+        <news:language>ru</news:language>
+      </news:publication>
+      <news:publication_date>2026-05-15T10:12:44.042Z</news:publication_date>
+      <news:title>С 1 июня в Узбекистане вводятся новые тарифы на электроэнергию и природный газ.</news:title>
+    </news:news>
+  </url>
+  <url>
     <loc>https://digest-news.uz/ru/news/v-strategii-molodezh-novogo-uzbekistana-2030-predusmotreny-lgoty-za-znanie-inostrannyh-yazykov</loc>
     <news:news>
       <news:publication>
@@ -68,25 +112,47 @@ xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
     </news:news>
   </url>
   <url>
-    <loc>https://digest-news.uz/ru/news/v-tashkente-moshennik-hodil-po-domam-i-sobiral-dengi-pod-vidom-sotrudnikov-elektrosetey</loc>
+    <loc>https://digest-news.uz/uz/news/v-tashkente-usilyat-kontrol-za-narusheniyami-parkovki-avtomobili-narushiteley-budut-evakuirovat-na-shtrafstoyanki</loc>
     <news:news>
       <news:publication>
         <news:name>Дайджест</news:name>
-        <news:language>ru</news:language>
+        <news:language>uz</news:language>
       </news:publication>
-      <news:publication_date>2026-05-13T12:04:36.835Z</news:publication_date>
-      <news:title>В Ташкенте мошенник ходил по домам и собирал деньги под видом сотрудников электросетей</news:title>
+      <news:publication_date>2026-05-15T11:44:01.886Z</news:publication_date>
+      <news:title>Toshkentda parkovka qoidalariga qarshi nazorat kuchaytiriladi: qoidabuzar avtomobillar jarima maydonchalariga olib ketiladi.</news:title>
     </news:news>
   </url>
   <url>
-    <loc>https://digest-news.uz/ru/news/v-tashkente-sotrudniki-banka-pohitili-u-vkladchika-500-000</loc>
+    <loc>https://digest-news.uz/uz/news/v-tashkente-dlya-shkolnikov-ustroyat-grandioznyy-besplatnyy-vypusknoy</loc>
     <news:news>
       <news:publication>
         <news:name>Дайджест</news:name>
-        <news:language>ru</news:language>
+        <news:language>uz</news:language>
       </news:publication>
-      <news:publication_date>2026-05-13T09:50:55.210Z</news:publication_date>
-      <news:title>В Ташкенте сотрудники банка похитили у вкладчика $500 000</news:title>
+      <news:publication_date>2026-05-15T10:55:22.003Z</news:publication_date>
+      <news:title>Toshkentda maktab o‘quvchilari uchun katta bepul bitiruv kechasi o‘tkaziladi.</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://digest-news.uz/uz/news/uchenye-preduprezhdayut-vozmozhny-zasuhi-i-navodneniya-iz-za-moschnogo-el-nino-v-2026-godu</loc>
+    <news:news>
+      <news:publication>
+        <news:name>Дайджест</news:name>
+        <news:language>uz</news:language>
+      </news:publication>
+      <news:publication_date>2026-05-15T10:25:51.561Z</news:publication_date>
+      <news:title>Olimlar ogohlantiradi: 2026-yilda kuchli El-Ninyo oqibatida dunyoning ayrim hududlarida qurg‘oqchilik, boshqalarida esa suv toshqinlari kuzatilishi mumkin.</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://digest-news.uz/uz/news/s-1-iyunya-v-uzbekistane-vvodyatsya-novye-tarify-na-elektroenergiyu-i-prirodnyy-gaz</loc>
+    <news:news>
+      <news:publication>
+        <news:name>Дайджест</news:name>
+        <news:language>uz</news:language>
+      </news:publication>
+      <news:publication_date>2026-05-15T10:12:44.042Z</news:publication_date>
+      <news:title>1-iyundan O`zbekistonda elektr energiyasi va tabiiy gaz uchun yangi tariflar joriy etiladi.</news:title>
     </news:news>
   </url>
   <url>
@@ -153,28 +219,6 @@ xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
       </news:publication>
       <news:publication_date>2026-05-13T13:45:21.565Z</news:publication_date>
       <news:title>O‘zbekiston 2028-yilgacha ilk o‘zbek kosmonavtini koinotga yuborishni rejalashtirmoqda.</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://digest-news.uz/uz/news/v-tashkente-moshennik-hodil-po-domam-i-sobiral-dengi-pod-vidom-sotrudnikov-elektrosetey</loc>
-    <news:news>
-      <news:publication>
-        <news:name>Дайджест</news:name>
-        <news:language>uz</news:language>
-      </news:publication>
-      <news:publication_date>2026-05-13T12:04:36.835Z</news:publication_date>
-      <news:title>Toshkentda soxta elektrik: uyma-uy yurib aholini qo‘rqitib pul undirgan shaxs fosh etildi</news:title>
-    </news:news>
-  </url>
-  <url>
-    <loc>https://digest-news.uz/uz/news/v-tashkente-sotrudniki-banka-pohitili-u-vkladchika-500-000</loc>
-    <news:news>
-      <news:publication>
-        <news:name>Дайджест</news:name>
-        <news:language>uz</news:language>
-      </news:publication>
-      <news:publication_date>2026-05-13T09:50:55.210Z</news:publication_date>
-      <news:title>Toshkentda bank xodimlari omonatchidan $500 000 o‘g‘irladi.</news:title>
     </news:news>
   </url>
 </urlset>
