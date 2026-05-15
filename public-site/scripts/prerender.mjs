@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import http from "http";
+import { execSync } from "child_process";
 import puppeteer from "puppeteer";
 
 const DIST_DIR = path.resolve("dist");
@@ -9,7 +10,7 @@ const NEWS_SITEMAP_PATH = path.resolve("public/news-sitemap.xml");
 const PORT = 4177;
 const LOCAL_URL = `http://127.0.0.1:${PORT}`;
 
-const MAX_NEWS_ARTICLES = 50;
+const MAX_NEWS_ARTICLES = 10;
 
 const baseRoutes = [
   "/ru",
@@ -53,6 +54,14 @@ const mimeTypes = {
   ".ico": "image/x-icon",
 };
 
+function freePort() {
+  try {
+    execSync(`fuser -k ${PORT}/tcp`, { stdio: "ignore" });
+  } catch {
+    // port is free
+  }
+}
+
 async function fileExists(filePath) {
   try {
     await fs.access(filePath);
@@ -90,7 +99,8 @@ function startServer() {
     }
   });
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    server.once("error", reject);
     server.listen(PORT, "127.0.0.1", () => resolve(server));
   });
 }
@@ -135,14 +145,31 @@ async function saveHtml(route, html) {
 
 function cleanHtml(html) {
   return html
-    .replace(/<script[^>]+src="https:\/\/yandex\.ru\/ads\/system\/context\.js"[^>]*><\/script>/gi, "")
-    .replace(/<script[^>]+src="https:\/\/pagead2\.googlesyndication\.com[^"]*"[^>]*><\/script>/gi, "")
-    .replace(/<script[^>]+src="https:\/\/www\.googletagmanager\.com[^"]*"[^>]*><\/script>/gi, "")
-    .replace(/<script[^>]+src="https:\/\/mc\.yandex\.ru[^"]*"[^>]*><\/script>/gi, "")
-    .replace(/<div[^>]*id="yandex_rtb[^"]*"[\s\S]*?<\/div><\/section>/gi, "</section>");
+    .replace(
+      /<script[^>]+src="https:\/\/yandex\.ru\/ads\/system\/context\.js"[^>]*><\/script>/gi,
+      "",
+    )
+    .replace(
+      /<script[^>]+src="https:\/\/pagead2\.googlesyndication\.com[^"]*"[^>]*><\/script>/gi,
+      "",
+    )
+    .replace(
+      /<script[^>]+src="https:\/\/www\.googletagmanager\.com[^"]*"[^>]*><\/script>/gi,
+      "",
+    )
+    .replace(
+      /<script[^>]+src="https:\/\/mc\.yandex\.ru[^"]*"[^>]*><\/script>/gi,
+      "",
+    )
+    .replace(
+      /<div[^>]*id="yandex_rtb[^"]*"[\s\S]*?<\/div><\/section>/gi,
+      "</section>",
+    );
 }
 
 async function prerender() {
+  freePort();
+
   const newsRoutes = await readFreshNewsRoutes();
   const routes = [...new Set([...baseRoutes, ...newsRoutes])];
 
