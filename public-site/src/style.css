@@ -766,6 +766,11 @@ body.dark-theme .latest-news-box li:hover {
   grid-column: 1 / -1;
 }
 
+.top-slide-loading {
+  background: #0b0b0b;
+  min-height: 520px;
+}
+
 .top-news-viewport {
   overflow: hidden;
   width: 100%;

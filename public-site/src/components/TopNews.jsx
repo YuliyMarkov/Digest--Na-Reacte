@@ -55,7 +55,7 @@ function TopNews({
   const sidebarArticles = useMemo(
     () => latestArticles.slice(0, 8),
     [latestArticles]
-  ); 
+  );
 
   useEffect(() => {
     if (sliderArticles.length <= 1) return;
@@ -129,16 +129,10 @@ function TopNews({
             <div className="top-news-slider top-news-slider--fallback">
               <div className="top-news-viewport">
                 <article className="top-slide">
-                  <div className="top-slide-link" aria-hidden="true">
-                    <img
-                      src="/preview.jpg"
-                      alt={t.fallbackTitle}
-                      width="1200"
-                      height="630"
-                      loading="eager"
-                      fetchPriority="high"
-                      decoding="async"
-                    />
+                  <div
+                    className="top-slide-link top-slide-loading"
+                    aria-hidden="true"
+                  >
                     <div className="top-slide-overlay">
                       <h3>{t.fallbackTitle}</h3>
                     </div>
