@@ -6,6 +6,7 @@ function Seo({
   canonical = "",
   alternateRu = "",
   alternateUz = "",
+  image = "",
   type = "website",
   schema = null,
   locale = "ru_RU",
@@ -40,7 +41,10 @@ function Seo({
       ? alternateUz.trim()
       : "";
 
-  const safeImage = "/preview.jpg";
+  const safeImage =
+    typeof image === "string" && image.trim()
+      ? image.trim()
+      : "/preview.jpg";
 
   const safePreloadImage =
     typeof preloadImage === "string" && preloadImage.trim()
@@ -76,7 +80,7 @@ function Seo({
 
   const fullImage = safeImage.startsWith("http")
     ? safeImage
-    : `${siteUrl}${safeImage}`;
+    : buildFullUrl(safeImage);
 
   const fullPreloadImage = safePreloadImage
     ? buildFullUrl(safePreloadImage)
