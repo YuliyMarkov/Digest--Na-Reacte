@@ -566,7 +566,7 @@ function NewsPage() {
       const layoutTop = window.scrollY + layoutRect.top;
       const layoutHeight = layout.offsetHeight;
       const sidebarHeight = sidebar.offsetHeight;
-      const offsetTop = 110;
+      const offsetTop = 24;
 
       const maxTranslate = Math.max(0, layoutHeight - sidebarHeight);
       const nextTranslate = Math.min(
