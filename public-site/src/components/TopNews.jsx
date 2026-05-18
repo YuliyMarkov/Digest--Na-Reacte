@@ -22,7 +22,6 @@ function TopNews({
       error: "Не удалось загрузить новости",
       prev: "Previous slide",
       next: "Next slide",
-      fallbackTitle: "Свежие новости Узбекистана и мира",
       fallbackItems: [
         "Загрузка главных новостей...",
         "Загрузка последних материалов...",
@@ -36,7 +35,6 @@ function TopNews({
       error: "Yangiliklarni yuklab bo‘lmadi",
       prev: "Previous slide",
       next: "Next slide",
-      fallbackTitle: "O‘zbekiston va dunyo bo‘yicha so‘nggi yangiliklar",
       fallbackItems: [
         "Asosiy yangiliklar yuklanmoqda...",
         "So‘nggi materiallar yuklanmoqda...",
@@ -49,12 +47,12 @@ function TopNews({
 
   const sliderArticles = useMemo(
     () => featuredArticles.slice(0, 5),
-    [featuredArticles]
+    [featuredArticles],
   );
 
   const sidebarArticles = useMemo(
     () => latestArticles.slice(0, 8),
-    [latestArticles]
+    [latestArticles],
   );
 
   useEffect(() => {
@@ -62,7 +60,7 @@ function TopNews({
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) =>
-        prev === sliderArticles.length - 1 ? 0 : prev + 1
+        prev === sliderArticles.length - 1 ? 0 : prev + 1,
       );
     }, 5000);
 
@@ -73,7 +71,7 @@ function TopNews({
     if (sliderArticles.length <= 1) return;
 
     setCurrentIndex((prev) =>
-      prev === 0 ? sliderArticles.length - 1 : prev - 1
+      prev === 0 ? sliderArticles.length - 1 : prev - 1,
     );
   };
 
@@ -81,7 +79,7 @@ function TopNews({
     if (sliderArticles.length <= 1) return;
 
     setCurrentIndex((prev) =>
-      prev === sliderArticles.length - 1 ? 0 : prev + 1
+      prev === sliderArticles.length - 1 ? 0 : prev + 1,
     );
   };
 
@@ -129,14 +127,7 @@ function TopNews({
             <div className="top-news-slider top-news-slider--fallback">
               <div className="top-news-viewport">
                 <article className="top-slide">
-                  <div
-                    className="top-slide-link top-slide-loading"
-                    aria-hidden="true"
-                  >
-                    <div className="top-slide-overlay">
-                      <h3>{t.fallbackTitle}</h3>
-                    </div>
-                  </div>
+                  <div className="top-slide-skeleton" aria-hidden="true" />
                 </article>
               </div>
             </div>
