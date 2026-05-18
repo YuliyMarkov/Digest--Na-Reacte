@@ -303,6 +303,8 @@ function NewsPage() {
   const [error, setError] = useState("");
   const [selectedReaction, setSelectedReaction] = useState(null);
   const [reactionLoading, setReactionLoading] = useState(false);
+  const articleLayoutRef = useRef(null);
+  const sidebarRef = useRef(null);
 
   const uiText = {
     ru: {
@@ -547,6 +549,44 @@ function NewsPage() {
       setSelectedReaction(null);
     }
   }, [article?.id]);
+
+  useEffect(() => {
+    const layout = articleLayoutRef.current;
+    const sidebar = sidebarRef.current;
+
+    if (!layout || !sidebar) return;
+
+    function updateSidebarPosition() {
+      if (window.innerWidth <= 1180) {
+        sidebar.style.transform = "";
+        return;
+      }
+
+      const layoutRect = layout.getBoundingClientRect();
+      const layoutTop = window.scrollY + layoutRect.top;
+      const layoutHeight = layout.offsetHeight;
+      const sidebarHeight = sidebar.offsetHeight;
+      const offsetTop = 110;
+
+      const maxTranslate = Math.max(0, layoutHeight - sidebarHeight);
+      const nextTranslate = Math.min(
+        Math.max(0, window.scrollY - layoutTop + offsetTop),
+        maxTranslate,
+      );
+
+      sidebar.style.transform = `translateY(${nextTranslate}px)`;
+    }
+
+    updateSidebarPosition();
+
+    window.addEventListener("scroll", updateSidebarPosition, { passive: true });
+    window.addEventListener("resize", updateSidebarPosition);
+
+    return () => {
+      window.removeEventListener("scroll", updateSidebarPosition);
+      window.removeEventListener("resize", updateSidebarPosition);
+    };
+  }, [article, latestArticles]);
 
   const localizedCategory = getCategoryName(article?.category, language);
   const localizedTitle = article?.translation?.title || "";
@@ -815,7 +855,7 @@ function NewsPage() {
           / <span>{localizedTitle}</span>
         </div>
 
-        <div className="article-layout">
+        <div className="article-layout" ref={articleLayoutRef}>
           <article className="article-main">
             <div className="article-meta">
               <span className="article-category">{localizedCategory}</span>
@@ -981,7 +1021,7 @@ function NewsPage() {
             </div>
           </article>
 
-          <aside className="top-news-sidebar">
+          <aside className="top-news-sidebar" ref={sidebarRef}>
             <h3>{t.latest}</h3>
 
             <div className="latest-news-box">

@@ -3683,35 +3683,65 @@ body.dark-theme .not-found-img.dark {
   color: #aaa;
 }
 
+/* =================== ARTICLE SIDEBAR BEHAVIOR =================== */
+/* Правый блок «Последние новости» на странице статьи:
+   едет вместе со скроллом внутри .article-layout и останавливается,
+   когда заканчивается статья. Блоки ниже статьи — реклама и
+   «Похожие новости» — остаются отдельными секциями. */
+
 .article-layout {
-  align-items: flex-start;
+  align-items: start;
 }
 
-.article-layout .top-news-sidebar {
+.article-layout > .top-news-sidebar {
   position: sticky;
-  top: 110px;
-  align-self: flex-start;
-
-  max-height: calc(100vh - 130px);
-  overflow-y: auto;
-
-  scrollbar-width: thin;
+  top: 120px;
+  align-self: start;
+  height: auto;
+  max-height: none;
+  overflow: visible;
 }
 
-.article-layout .top-news-sidebar::-webkit-scrollbar {
-  width: 6px;
+.article-layout > .top-news-sidebar .latest-news-box {
+  height: auto;
+  max-height: none;
+  overflow: visible;
 }
 
-.article-layout .top-news-sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
-}
-
-@media (max-width: 900px) {
-  .article-layout .top-news-sidebar {
+@media (max-width: 1180px) {
+  .article-layout > .top-news-sidebar {
     position: static;
     top: auto;
+  }
+
+  .article-layout > .top-news-sidebar .latest-news-box {
+    height: 320px;
     max-height: none;
-    overflow: visible;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 700px) {
+  .article-layout > .top-news-sidebar .latest-news-box {
+    height: 280px;
+  }
+}
+.article-layout .top-news-sidebar {
+  position: relative;
+  top: auto;
+  align-self: flex-start;
+  transition: none;
+  will-change: transform;
+}
+
+.article-layout .top-news-sidebar .latest-news-box {
+  max-height: none;
+  overflow: visible;
+}
+
+@media (max-width: 1180px) {
+  .article-layout .top-news-sidebar {
+    transform: none !important;
   }
 }
