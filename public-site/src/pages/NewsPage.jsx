@@ -830,7 +830,6 @@ function NewsPage() {
 
   return (
     <main className="main container">
-      <YandexAdBlock />
       <Seo
         title={seoTitle}
         description={seoDescription}
