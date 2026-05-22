@@ -1049,8 +1049,6 @@ function NewsPage() {
         </div>
       </section>
 
-      <YandexAdBlock />
-
       <section className="more-news-section">
         <div className="news-feed-header">
           <h2>{t.related}</h2>
