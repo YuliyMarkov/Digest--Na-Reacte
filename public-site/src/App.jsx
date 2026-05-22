@@ -5,7 +5,7 @@ import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import Loader from "./components/Loader";
 import YandexFullscreenAd from "./components/YandexFullscreenAd";
-import YandexFullScreenDesktopAd from "./components/YandexFullScreenDesktopAd";
+import YandexFullscreenDesktopAd from "./components/YandexFullscreenDesktopAd";
 import YandexFloorDesktopAd from "./components/YandexFloorDesktopAd";
 import YandexFloorMobileAd from "./components/YandexFloorMobileAd";
 
@@ -72,7 +72,7 @@ function App() {
   return (
     <>
       <YandexFullscreenAd />
-      <YandexFullScreenDesktopAd />
+      <YandexFullscreenDesktopAd />
       <YandexFloorDesktopAd />
       <YandexFloorMobileAd />
 
