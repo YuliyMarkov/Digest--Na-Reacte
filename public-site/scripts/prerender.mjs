@@ -144,27 +144,7 @@ async function saveHtml(route, html) {
 }
 
 function cleanHtml(html) {
-  return html
-    .replace(
-      /<script[^>]+src="https:\/\/yandex\.ru\/ads\/system\/context\.js"[^>]*><\/script>/gi,
-      "",
-    )
-    .replace(
-      /<script[^>]+src="https:\/\/pagead2\.googlesyndication\.com[^"]*"[^>]*><\/script>/gi,
-      "",
-    )
-    .replace(
-      /<script[^>]+src="https:\/\/www\.googletagmanager\.com[^"]*"[^>]*><\/script>/gi,
-      "",
-    )
-    .replace(
-      /<script[^>]+src="https:\/\/mc\.yandex\.ru[^"]*"[^>]*><\/script>/gi,
-      "",
-    )
-    .replace(
-      /<div[^>]*id="yandex_rtb[^"]*"[\s\S]*?<\/div><\/section>/gi,
-      "</section>",
-    );
+  return html;
 }
 
 async function prerender() {
