@@ -5,6 +5,9 @@ import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import Loader from "./components/Loader";
 import YandexFullscreenAd from "./components/YandexFullscreenAd";
+import YandexFullScreenDesktopAd from "./components/YandexFullScreenDesktopAd";
+import YandexFloorDesktopAd from "./components/YandexFloorDesktopAd";
+import YandexFloorMobileAd from "./components/YandexFloorMobileAd";
 
 const TopWidgets = lazy(() => import("./components/TopWidgets"));
 const ReelsModal = lazy(() => import("./components/ReelsModal"));
@@ -69,6 +72,9 @@ function App() {
   return (
     <>
       <YandexFullscreenAd />
+      <YandexFullScreenDesktopAd />
+      <YandexFloorDesktopAd />
+      <YandexFloorMobileAd />
 
       <ScrollToTop />
       <Header />
@@ -84,7 +90,10 @@ function App() {
           <Route path="/" element={<Navigate to="/ru" replace />} />
 
           <Route path="/:lang" element={<HomePage onOpenReel={open} />} />
-          <Route path="/:lang/category/:slug" element={<CategoryPageWrapper />} />
+          <Route
+            path="/:lang/category/:slug"
+            element={<CategoryPageWrapper />}
+          />
           <Route path="/:lang/news/:slug" element={<NewsPageWrapper />} />
 
           <Route path="/:lang/about" element={<AboutPage />} />

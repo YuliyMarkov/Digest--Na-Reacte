@@ -1094,6 +1094,9 @@ function NewsPage() {
           })}
         </div>
       </section>
+
+      <YandexAdBlock />
+
     </main>
   );
 }
