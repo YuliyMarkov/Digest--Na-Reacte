@@ -10,7 +10,7 @@ const NEWS_SITEMAP_PATH = path.resolve("public/news-sitemap.xml");
 const PORT = 4177;
 const LOCAL_URL = `http://127.0.0.1:${PORT}`;
 
-const MAX_NEWS_ARTICLES = 10;
+const MAX_NEWS_ARTICLES = 50;
 
 const baseRoutes = [
   "/ru",

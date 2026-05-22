@@ -5,6 +5,9 @@ const SITE_URL = "https://digest-news.uz";
 const OUTPUT_PATH = "./public/sitemap.xml";
 const NEWS_OUTPUT_PATH = "./public/news-sitemap.xml";
 
+const NEWS_FRESH_HOURS = 48;
+const MAX_NEWS_SITEMAP_ARTICLES = 100;
+
 const staticPages = [
   "/ru",
   "/uz",
@@ -47,6 +50,19 @@ function formatLastMod(dateValue) {
   return date.toISOString();
 }
 
+function getArticleDate(article) {
+  const dateValue = article?.publishedAt || article?.updatedAt;
+  const date = new Date(dateValue);
+
+  if (Number.isNaN(date.getTime())) return 0;
+
+  return date.getTime();
+}
+
+function sortNewestFirst(articles = []) {
+  return [...articles].sort((a, b) => getArticleDate(b) - getArticleDate(a));
+}
+
 function buildUrlEntry(loc, options = {}) {
   const { lastmod, changefreq, priority } = options;
 
@@ -75,7 +91,7 @@ function buildNewsEntry(article, lang) {
     article.slug;
 
   const publicationDate = formatLastMod(
-    article.publishedAt || article.updatedAt
+    article.publishedAt || article.updatedAt,
   );
 
   if (!publicationDate) return null;
@@ -88,9 +104,7 @@ function buildNewsEntry(article, lang) {
     `        <news:name>${escapeXml("Дайджест")}</news:name>`,
     `        <news:language>${lang}</news:language>`,
     "      </news:publication>",
-    `      <news:publication_date>${escapeXml(
-      publicationDate
-    )}</news:publication_date>`,
+    `      <news:publication_date>${escapeXml(publicationDate)}</news:publication_date>`,
     `      <news:title>${escapeXml(title)}</news:title>`,
     "    </news:news>",
     "  </url>",
@@ -98,16 +112,13 @@ function buildNewsEntry(article, lang) {
 }
 
 function isFreshNews(article) {
-  if (!article?.publishedAt) return false;
+  const articleDate = getArticleDate(article);
 
-  const publishedDate = new Date(article.publishedAt);
+  if (!articleDate) return false;
 
-  if (Number.isNaN(publishedDate.getTime())) return false;
+  const diff = Date.now() - articleDate;
 
-  const now = Date.now();
-  const diff = now - publishedDate.getTime();
-
-  return diff <= 48 * 60 * 60 * 1000;
+  return diff <= NEWS_FRESH_HOURS * 60 * 60 * 1000;
 }
 
 async function fetchArticles(lang) {
@@ -125,7 +136,7 @@ async function fetchArticles(lang) {
     throw new Error(`Invalid API response for lang=${lang}`);
   }
 
-  return data.articles;
+  return sortNewestFirst(data.articles);
 }
 
 async function generateSitemaps() {
@@ -145,9 +156,9 @@ async function generateSitemaps() {
             path === "/ru" || path === "/uz"
               ? "1.0"
               : path.includes("/category/")
-              ? "0.9"
-              : "0.5",
-        })
+                ? "0.9"
+                : "0.5",
+        }),
       );
     }
 
@@ -156,12 +167,10 @@ async function generateSitemaps() {
 
       sitemapEntries.push(
         buildUrlEntry(`${SITE_URL}/ru/news/${article.slug}`, {
-          lastmod: formatLastMod(
-            article.updatedAt || article.publishedAt
-          ),
+          lastmod: formatLastMod(article.updatedAt || article.publishedAt),
           changefreq: "daily",
           priority: "0.8",
-        })
+        }),
       );
     }
 
@@ -170,12 +179,10 @@ async function generateSitemaps() {
 
       sitemapEntries.push(
         buildUrlEntry(`${SITE_URL}/uz/news/${article.slug}`, {
-          lastmod: formatLastMod(
-            article.updatedAt || article.publishedAt
-          ),
+          lastmod: formatLastMod(article.updatedAt || article.publishedAt),
           changefreq: "daily",
           priority: "0.8",
-        })
+        }),
       );
     }
 
@@ -194,18 +201,17 @@ async function generateSitemaps() {
     const freshRuArticles = ruArticles.filter(isFreshNews);
     const freshUzArticles = uzArticles.filter(isFreshNews);
 
+    const freshNewsArticles = [
+      ...freshRuArticles.map((article) => ({ article, lang: "ru" })),
+      ...freshUzArticles.map((article) => ({ article, lang: "uz" })),
+    ]
+      .sort((a, b) => getArticleDate(b.article) - getArticleDate(a.article))
+      .slice(0, MAX_NEWS_SITEMAP_ARTICLES);
+
     const newsEntries = [];
 
-    for (const article of freshRuArticles) {
-      const entry = buildNewsEntry(article, "ru");
-
-      if (entry) {
-        newsEntries.push(entry);
-      }
-    }
-
-    for (const article of freshUzArticles) {
-      const entry = buildNewsEntry(article, "uz");
+    for (const item of freshNewsArticles) {
+      const entry = buildNewsEntry(item.article, item.lang);
 
       if (entry) {
         newsEntries.push(entry);
@@ -223,9 +229,7 @@ async function generateSitemaps() {
 
     await fs.writeFile(NEWS_OUTPUT_PATH, newsXml, "utf8");
 
-    console.log(
-      `News sitemap generated successfully: ${NEWS_OUTPUT_PATH}`
-    );
+    console.log(`News sitemap generated successfully: ${NEWS_OUTPUT_PATH}`);
   } catch (error) {
     console.error("Failed to generate sitemaps:", error);
     process.exit(1);
