@@ -50,6 +50,16 @@ function Header() {
 
   const t = uiText[language] || uiText.ru
 
+  const telegramUrl =
+    language === 'uz'
+      ? 'https://t.me/+RI7vQtxE5pJhZTgy'
+      : 'https://t.me/+rI4mVrzYphxkZGYy'
+
+  const instagramUrl =
+    language === 'uz'
+      ? 'https://www.instagram.com/digestuzb/'
+      : 'https://www.instagram.com/digest.uzb/'
+
   const visibleCategories = categories.filter((category) => category.isVisible)
 
   useEffect(() => {
@@ -221,7 +231,7 @@ function Header() {
 
             <div className="mobile-socials-grid">
               <a
-                href="https://t.me/+rI4mVrzYphxkZGYy"
+                href={telegramUrl}
                 className="mobile-social-card"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -232,7 +242,7 @@ function Header() {
               </a>
 
               <a
-                href="https://www.instagram.com/digest.uzbekistan/"
+                href={instagramUrl}
                 className="mobile-social-card"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -297,7 +307,7 @@ function Header() {
 
           <div className="socials" aria-label="Социальные сети">
             <a
-              href="https://t.me/+rI4mVrzYphxkZGYy"
+              href={telegramUrl}
               className="social telegram"
               aria-label="Telegram"
               target="_blank"
@@ -305,7 +315,7 @@ function Header() {
             ></a>
 
             <a
-              href="https://www.instagram.com/digest.uzbekistan/"
+              href={instagramUrl}
               className="social instagram"
               aria-label="Instagram"
               target="_blank"
