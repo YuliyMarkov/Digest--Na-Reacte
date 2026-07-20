@@ -1772,6 +1772,44 @@ body.dark-theme .article-meta {
   margin-top: 20px;
 }
 
+/* =================== ARTICLE BLOCKQUOTE =================== */
+
+.article-main .article-content blockquote,
+.article-main .rich-text-content blockquote,
+.article-content blockquote,
+.rich-text-content blockquote {
+  margin: 24px 0;
+  padding: 18px 22px;
+  border-left: 4px solid #2563eb;
+  border-radius: 14px;
+  background: #f1f5f9;
+  color: #1e293b;
+  font-style: italic;
+}
+
+.article-main .article-content blockquote *,
+.article-main .rich-text-content blockquote *,
+.article-content blockquote *,
+.rich-text-content blockquote * {
+  color: inherit;
+}
+
+body.dark-theme .article-main .article-content blockquote,
+body.dark-theme .article-main .rich-text-content blockquote,
+body.dark-theme .article-content blockquote,
+body.dark-theme .rich-text-content blockquote {
+  background: #2a2a2a;
+  color: #f5f5f5;
+  border-left-color: #ace600;
+}
+
+body.dark-theme .article-main .article-content blockquote *,
+body.dark-theme .article-main .rich-text-content blockquote *,
+body.dark-theme .article-content blockquote *,
+body.dark-theme .rich-text-content blockquote * {
+  color: inherit;
+}
+
 .article-main a {
   color: #ff1212;
   text-decoration: none;
