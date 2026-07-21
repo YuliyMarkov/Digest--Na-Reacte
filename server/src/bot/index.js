@@ -75,7 +75,7 @@ function getArticleAuthorId() {
 
   if (!Number.isInteger(authorId) || authorId <= 0) {
     throw new Error(
-      "TELEGRAM_ARTICLE_AUTHOR_ID не указан или имеет неверный формат"
+      "TELEGRAM_ARTICLE_AUTHOR_ID не указан или имеет неверный формат",
     );
   }
 
@@ -91,7 +91,7 @@ function getArticleAuthorId() {
 function getPublicSiteUrl() {
   return (process.env.PUBLIC_SITE_URL || "https://digest-news.uz").replace(
     /\/+$/,
-    ""
+    "",
   );
 }
 
@@ -262,9 +262,7 @@ async function sendLongMessage(ctx, text, options = {}) {
 
     chunks.push(remainingText.slice(0, splitIndex));
 
-    remainingText = remainingText
-      .slice(splitIndex)
-      .trimStart();
+    remainingText = remainingText.slice(splitIndex).trimStart();
   }
 
   if (remainingText) {
@@ -284,15 +282,9 @@ async function safelyDeleteMessage(ctx, message) {
   }
 
   try {
-    await ctx.api.deleteMessage(
-      message.chat.id,
-      message.message_id
-    );
+    await ctx.api.deleteMessage(message.chat.id, message.message_id);
   } catch (error) {
-    console.warn(
-      "Не удалось удалить сообщение:",
-      error.message
-    );
+    console.warn("Не удалось удалить сообщение:", error.message);
   }
 }
 
@@ -320,7 +312,7 @@ function getCategoriesKeyboard(categories) {
   categories.forEach((category, index) => {
     keyboard.text(
       getCategoryDisplayName(category),
-      `article:category:${category.id}`
+      `article:category:${category.id}`,
     );
 
     if (index % 2 === 1) {
@@ -328,9 +320,7 @@ function getCategoriesKeyboard(categories) {
     }
   });
 
-  keyboard
-    .row()
-    .text("❌ Отмена", "article:cancel");
+  keyboard.row().text("❌ Отмена", "article:cancel");
 
   return keyboard;
 }
@@ -355,9 +345,7 @@ async function askForImageUrl(ctx) {
   const session = getPublicationSession(ctx);
 
   if (!session) {
-    await ctx.reply(
-      "Сначала отправьте текст новости."
-    );
+    await ctx.reply("Сначала отправьте текст новости.");
     return;
   }
 
@@ -372,7 +360,7 @@ async function askForImageUrl(ctx) {
       "https://example.com/image.jpg",
       "",
       "Ссылка должна начинаться с http:// или https://",
-    ].join("\n")
+    ].join("\n"),
   );
 }
 
@@ -380,18 +368,14 @@ async function askForCategory(ctx) {
   const session = getPublicationSession(ctx);
 
   if (!session) {
-    await ctx.reply(
-      "Сначала отправьте текст новости."
-    );
+    await ctx.reply("Сначала отправьте текст новости.");
     return;
   }
 
   const categories = await loadCategories();
 
   if (categories.length === 0) {
-    await ctx.reply(
-      "❌ В базе нет доступных категорий."
-    );
+    await ctx.reply("❌ В базе нет доступных категорий.");
     return;
   }
 
@@ -408,11 +392,7 @@ async function askForCategory(ctx) {
 async function showPublicationPreview(ctx) {
   const session = getPublicationSession(ctx);
 
-  if (
-    !session?.article ||
-    !session?.imageUrl ||
-    !session?.category
-  ) {
+  if (!session?.article || !session?.imageUrl || !session?.category) {
     deletePublicationSession(ctx);
 
     await ctx.reply(
@@ -420,7 +400,7 @@ async function showPublicationPreview(ctx) {
         "❌ Не хватает данных для публикации.",
         "",
         "Отправьте исходный текст новости заново.",
-      ].join("\n")
+      ].join("\n"),
     );
 
     return;
@@ -429,12 +409,9 @@ async function showPublicationPreview(ctx) {
   session.step = SESSION_STEPS.READY_TO_PUBLISH;
   setPublicationSession(ctx, session);
 
-  await ctx.reply(
-    formatPublicationPreview(session),
-    {
-      reply_markup: getReadyToPublishKeyboard(),
-    }
-  );
+  await ctx.reply(formatPublicationPreview(session), {
+    reply_markup: getReadyToPublishKeyboard(),
+  });
 }
 
 async function publishArticle(ctx) {
@@ -457,11 +434,7 @@ async function publishArticle(ctx) {
     return;
   }
 
-  if (
-    !session.article ||
-    !session.imageUrl ||
-    !session.category?.id
-  ) {
+  if (!session.article || !session.imageUrl || !session.category?.id) {
     await ctx.answerCallbackQuery({
       text: "Не хватает данных для публикации.",
       show_alert: true,
@@ -477,48 +450,37 @@ async function publishArticle(ctx) {
     text: "Публикую статью...",
   });
 
-  const processingMessage = await ctx.reply(
-    "⏳ Публикую новость на сайте..."
-  );
+  const processingMessage = await ctx.reply("⏳ Публикую новость на сайте...");
 
   try {
     const authorId = getArticleAuthorId();
-    const slug = await createUniqueSlug(
-      session.article.title
-    );
+    const slug = await createUniqueSlug(session.article.title);
 
-    const publishedArticle =
-      await articleService.createArticle({
-        slug,
+    const publishedArticle = await articleService.createArticle({
+      slug,
 
-        categoryIds: [
-          session.category.id,
-        ],
+      categoryIds: [session.category.id],
 
-        authorId,
-        status: "published",
-        coverImage: session.imageUrl,
-        isFeatured: false,
+      authorId,
+      status: "published",
+      coverImage: session.imageUrl,
+      isFeatured: false,
 
-        ru: {
-          title: session.article.title,
-          excerpt: session.article.excerpt || null,
-          content: session.article.content,
-          seoTitle: session.article.seoTitle || null,
-          seoDescription:
-            session.article.seoDescription || null,
-          telegramEmbedUrl: null,
-          youtubeEmbedUrl: null,
-        },
+      ru: {
+        title: session.article.title,
+        excerpt: session.article.excerpt || null,
+        content: session.article.content,
+        seoTitle: session.article.seoTitle || null,
+        seoDescription: session.article.seoDescription || null,
+        telegramEmbedUrl: null,
+        youtubeEmbedUrl: null,
+      },
 
-        uz: null,
-      });
+      uz: null,
+    });
 
     deletePublicationSession(ctx);
-    await safelyDeleteMessage(
-      ctx,
-      processingMessage
-    );
+    await safelyDeleteMessage(ctx, processingMessage);
 
     const articleUrl = `${getPublicSiteUrl()}/news/${publishedArticle.slug}`;
 
@@ -527,7 +489,7 @@ async function publishArticle(ctx) {
         "✅ Новость опубликована",
         "",
         publishedArticle.translations?.find(
-          (translation) => translation.locale === "ru"
+          (translation) => translation.locale === "ru",
         )?.title || session.article.title,
         "",
         `🔗 ${articleUrl}`,
@@ -535,42 +497,26 @@ async function publishArticle(ctx) {
       {
         reply_markup: new InlineKeyboard().url(
           "🌐 Открыть новость",
-          articleUrl
+          articleUrl,
         ),
-      }
+      },
     );
   } catch (error) {
-    console.error(
-      "Telegram article publication failed:",
-      error
-    );
+    console.error("Telegram article publication failed:", error);
 
-    session.step =
-      SESSION_STEPS.READY_TO_PUBLISH;
+    session.step = SESSION_STEPS.READY_TO_PUBLISH;
 
     setPublicationSession(ctx, session);
 
-    await safelyDeleteMessage(
-      ctx,
-      processingMessage
-    );
+    await safelyDeleteMessage(ctx, processingMessage);
 
-    let message =
-      "Не удалось опубликовать статью.";
+    let message = "Не удалось опубликовать статью.";
 
-    if (
-      error.code === "AUTHOR_NOT_FOUND"
-    ) {
-      message =
-        "Автор статьи не найден. Проверьте TELEGRAM_ARTICLE_AUTHOR_ID.";
-    } else if (
-      error.code === "CATEGORY_NOT_FOUND"
-    ) {
-      message =
-        "Выбранная категория больше не существует.";
-    } else if (
-      error.code === "SLUG_ALREADY_EXISTS"
-    ) {
+    if (error.code === "AUTHOR_NOT_FOUND") {
+      message = "Автор статьи не найден. Проверьте TELEGRAM_ARTICLE_AUTHOR_ID.";
+    } else if (error.code === "CATEGORY_NOT_FOUND") {
+      message = "Выбранная категория больше не существует.";
+    } else if (error.code === "SLUG_ALREADY_EXISTS") {
       message =
         "Статья с таким адресом уже существует. Попробуйте опубликовать ещё раз.";
     } else if (error.message) {
@@ -578,8 +524,7 @@ async function publishArticle(ctx) {
     }
 
     await ctx.reply(`❌ ${message}`, {
-      reply_markup:
-        getReadyToPublishKeyboard(),
+      reply_markup: getReadyToPublishKeyboard(),
     });
   }
 }
@@ -589,22 +534,16 @@ export function getTelegramBot() {
     return telegramBot;
   }
 
-  const token =
-    process.env.TELEGRAM_BOT_TOKEN;
+  const token = process.env.TELEGRAM_BOT_TOKEN;
 
   if (!token) {
-    throw new Error(
-      "TELEGRAM_BOT_TOKEN не указан в server/.env"
-    );
+    throw new Error("TELEGRAM_BOT_TOKEN не указан в server/.env");
   }
 
   telegramBot = new Bot(token);
 
   telegramBot.catch((error) => {
-    console.error(
-      "Telegram bot error:",
-      error.error
-    );
+    console.error("Telegram bot error:", error.error);
   });
 
   /**
@@ -619,7 +558,7 @@ export function getTelegramBot() {
       console.warn(
         `Telegram access denied: user_id=${ctx.from.id}, username=@${
           ctx.from.username || "unknown"
-        }`
+        }`,
       );
 
       await ctx.reply(
@@ -627,7 +566,7 @@ export function getTelegramBot() {
           "⛔ У вас нет доступа к этому боту.",
           "",
           `Ваш Telegram ID: ${ctx.from.id}`,
-        ].join("\n")
+        ].join("\n"),
       );
 
       return;
@@ -636,401 +575,299 @@ export function getTelegramBot() {
     await next();
   });
 
-  telegramBot.command(
-    "start",
-    async (ctx) => {
+  telegramBot.command("start", async (ctx) => {
+    await ctx.reply(
+      [
+        "Привет! Это бот управления Digest News.",
+        "",
+        "Отправьте текст новости, Telegram-пост, пресс-релиз или заметку.",
+        "Я подготовлю статью и помогу сразу опубликовать её на сайте.",
+        "",
+        "Команды:",
+        "/id — показать Telegram ID",
+        "/cancel — отменить текущую публикацию",
+      ].join("\n"),
+    );
+  });
+
+  telegramBot.command("id", async (ctx) => {
+    await ctx.reply(`Ваш Telegram ID: ${ctx.from.id}`);
+  });
+
+  telegramBot.command("cancel", async (ctx) => {
+    const session = getPublicationSession(ctx);
+
+    if (!session) {
+      await ctx.reply("Сейчас нет незавершённой публикации.");
+      return;
+    }
+
+    deletePublicationSession(ctx);
+
+    await ctx.reply(
+      [
+        "❌ Публикация отменена.",
+        "",
+        "Можете отправить текст новой новости.",
+      ].join("\n"),
+    );
+  });
+
+  telegramBot.callbackQuery("article:add_image", async (ctx) => {
+    await ctx.answerCallbackQuery();
+    await askForImageUrl(ctx);
+  });
+
+  telegramBot.callbackQuery("article:change_image", async (ctx) => {
+    await ctx.answerCallbackQuery();
+    await askForImageUrl(ctx);
+  });
+
+  telegramBot.callbackQuery("article:change_category", async (ctx) => {
+    await ctx.answerCallbackQuery();
+
+    try {
+      await askForCategory(ctx);
+    } catch (error) {
+      console.error("Failed to load categories:", error);
+
       await ctx.reply(
         [
-          "Привет! Это бот управления Digest News.",
+          "❌ Не удалось загрузить категории.",
           "",
-          "Отправьте текст новости, Telegram-пост, пресс-релиз или заметку.",
-          "Я подготовлю статью и помогу сразу опубликовать её на сайте.",
-          "",
-          "Команды:",
-          "/id — показать Telegram ID",
-          "/cancel — отменить текущую публикацию",
-        ].join("\n")
+          error.message ? `Ошибка: ${error.message}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n"),
       );
     }
-  );
+  });
 
-  telegramBot.command(
-    "id",
-    async (ctx) => {
-      await ctx.reply(
-        `Ваш Telegram ID: ${ctx.from.id}`
-      );
+  telegramBot.callbackQuery("article:cancel", async (ctx) => {
+    deletePublicationSession(ctx);
+
+    await ctx.answerCallbackQuery({
+      text: "Публикация отменена",
+    });
+
+    await ctx.reply(
+      [
+        "❌ Публикация отменена.",
+        "",
+        "Можете отправить текст новой новости.",
+      ].join("\n"),
+    );
+  });
+
+  telegramBot.callbackQuery(/^article:category:(\d+)$/, async (ctx) => {
+    const session = getPublicationSession(ctx);
+
+    if (!session) {
+      await ctx.answerCallbackQuery({
+        text: "Сессия не найдена. Отправьте новость заново.",
+        show_alert: true,
+      });
+
+      return;
     }
-  );
 
-  telegramBot.command(
-    "cancel",
-    async (ctx) => {
-      const session =
-        getPublicationSession(ctx);
+    const categoryId = Number(ctx.match[1]);
 
-      if (!session) {
-        await ctx.reply(
-          "Сейчас нет незавершённой публикации."
-        );
+    try {
+      const category = await prisma.category.findFirst({
+        where: {
+          id: categoryId,
+          isVisible: true,
+        },
+      });
+
+      if (!category) {
+        await ctx.answerCallbackQuery({
+          text: "Категория не найдена или скрыта.",
+          show_alert: true,
+        });
+
         return;
       }
 
-      deletePublicationSession(ctx);
+      session.category = {
+        id: category.id,
+        slug: category.slug,
+        nameRu: category.nameRu,
+        nameUz: category.nameUz,
+      };
 
-      await ctx.reply(
-        [
-          "❌ Публикация отменена.",
-          "",
-          "Можете отправить текст новой новости.",
-        ].join("\n")
-      );
+      setPublicationSession(ctx, session);
+
+      await ctx.answerCallbackQuery({
+        text: `Выбрана категория: ${category.nameRu}`,
+      });
+
+      await showPublicationPreview(ctx);
+    } catch (error) {
+      console.error("Telegram category selection failed:", error);
+
+      await ctx.answerCallbackQuery({
+        text: "Не удалось выбрать категорию.",
+        show_alert: true,
+      });
     }
-  );
+  });
 
-  telegramBot.callbackQuery(
-    "article:add_image",
-    async (ctx) => {
-      await ctx.answerCallbackQuery();
-      await askForImageUrl(ctx);
+  telegramBot.callbackQuery("article:publish", async (ctx) => {
+    await publishArticle(ctx);
+  });
+
+  telegramBot.on("message:text", async (ctx) => {
+    const sourceText = ctx.message.text.trim();
+
+    if (!sourceText) {
+      await ctx.reply("Пришлите текст новости.");
+      return;
     }
-  );
 
-  telegramBot.callbackQuery(
-    "article:change_image",
-    async (ctx) => {
-      await ctx.answerCallbackQuery();
-      await askForImageUrl(ctx);
+    if (sourceText.startsWith("/")) {
+      return;
     }
-  );
 
-  telegramBot.callbackQuery(
-    "article:change_category",
-    async (ctx) => {
-      await ctx.answerCallbackQuery();
+    const session = getPublicationSession(ctx);
+
+    /**
+     * Бот ожидает ссылку на обложку.
+     */
+    if (session?.step === SESSION_STEPS.WAITING_IMAGE) {
+      const imageUrl = normalizeImageUrl(sourceText);
+
+      if (!isValidHttpUrl(imageUrl)) {
+        await ctx.reply(
+          [
+            "❌ Это не похоже на корректную ссылку.",
+            "",
+            "Пришлите публичную ссылку, начинающуюся с http:// или https://",
+          ].join("\n"),
+        );
+
+        return;
+      }
+
+      session.imageUrl = imageUrl;
+      setPublicationSession(ctx, session);
+
+      await ctx.reply("✅ Ссылка на обложку сохранена.");
 
       try {
         await askForCategory(ctx);
       } catch (error) {
-        console.error(
-          "Failed to load categories:",
-          error
-        );
+        console.error("Failed to load categories:", error);
 
         await ctx.reply(
           [
             "❌ Не удалось загрузить категории.",
             "",
-            error.message
-              ? `Ошибка: ${error.message}`
-              : "",
+            error.message ? `Ошибка: ${error.message}` : "",
           ]
             .filter(Boolean)
-            .join("\n")
+            .join("\n"),
         );
       }
+
+      return;
     }
-  );
 
-  telegramBot.callbackQuery(
-    "article:cancel",
-    async (ctx) => {
-      deletePublicationSession(ctx);
-
-      await ctx.answerCallbackQuery({
-        text: "Публикация отменена",
-      });
-
+    /**
+     * Пока бот ждёт выбора категории или публикации,
+     * новый текст не запускает новую генерацию.
+     */
+    if (
+      session?.step === SESSION_STEPS.WAITING_CATEGORY ||
+      session?.step === SESSION_STEPS.READY_TO_PUBLISH ||
+      session?.step === SESSION_STEPS.PUBLISHING
+    ) {
       await ctx.reply(
         [
-          "❌ Публикация отменена.",
+          "Сейчас уже готовится другая публикация.",
           "",
-          "Можете отправить текст новой новости.",
-        ].join("\n")
-      );
-    }
-  );
-
-  telegramBot.callbackQuery(
-    /^article:category:(\d+)$/,
-    async (ctx) => {
-      const session =
-        getPublicationSession(ctx);
-
-      if (!session) {
-        await ctx.answerCallbackQuery({
-          text: "Сессия не найдена. Отправьте новость заново.",
-          show_alert: true,
-        });
-
-        return;
-      }
-
-      const categoryId = Number(
-        ctx.match[1]
+          "Используйте кнопки под сообщением или команду /cancel.",
+        ].join("\n"),
       );
 
-      try {
-        const category =
-          await prisma.category.findFirst({
-            where: {
-              id: categoryId,
-              isVisible: true,
-            },
-          });
-
-        if (!category) {
-          await ctx.answerCallbackQuery({
-            text: "Категория не найдена или скрыта.",
-            show_alert: true,
-          });
-
-          return;
-        }
-
-        session.category = {
-          id: category.id,
-          slug: category.slug,
-          nameRu: category.nameRu,
-          nameUz: category.nameUz,
-        };
-
-        setPublicationSession(
-          ctx,
-          session
-        );
-
-        await ctx.answerCallbackQuery({
-          text: `Выбрана категория: ${category.nameRu}`,
-        });
-
-        await showPublicationPreview(ctx);
-      } catch (error) {
-        console.error(
-          "Telegram category selection failed:",
-          error
-        );
-
-        await ctx.answerCallbackQuery({
-          text: "Не удалось выбрать категорию.",
-          show_alert: true,
-        });
-      }
+      return;
     }
-  );
 
-  telegramBot.callbackQuery(
-    "article:publish",
-    async (ctx) => {
-      await publishArticle(ctx);
-    }
-  );
-
-  telegramBot.on(
-    "message:text",
-    async (ctx) => {
-      const sourceText =
-        ctx.message.text.trim();
-
-      if (!sourceText) {
-        await ctx.reply(
-          "Пришлите текст новости."
-        );
-        return;
-      }
-
-      if (sourceText.startsWith("/")) {
-        return;
-      }
-
-      const session =
-        getPublicationSession(ctx);
-
-      /**
-       * Бот ожидает ссылку на обложку.
-       */
-      if (
-        session?.step ===
-        SESSION_STEPS.WAITING_IMAGE
-      ) {
-        const imageUrl =
-          normalizeImageUrl(sourceText);
-
-        if (!isValidHttpUrl(imageUrl)) {
-          await ctx.reply(
-            [
-              "❌ Это не похоже на корректную ссылку.",
-              "",
-              "Пришлите публичную ссылку, начинающуюся с http:// или https://",
-            ].join("\n")
-          );
-
-          return;
-        }
-
-        session.imageUrl = imageUrl;
-        setPublicationSession(
-          ctx,
-          session
-        );
-
-        await ctx.reply(
-          "✅ Ссылка на обложку сохранена."
-        );
-
-        try {
-          await askForCategory(ctx);
-        } catch (error) {
-          console.error(
-            "Failed to load categories:",
-            error
-          );
-
-          await ctx.reply(
-            [
-              "❌ Не удалось загрузить категории.",
-              "",
-              error.message
-                ? `Ошибка: ${error.message}`
-                : "",
-            ]
-              .filter(Boolean)
-              .join("\n")
-          );
-        }
-
-        return;
-      }
-
-      /**
-       * Пока бот ждёт выбора категории или публикации,
-       * новый текст не запускает новую генерацию.
-       */
-      if (
-        session?.step ===
-          SESSION_STEPS.WAITING_CATEGORY ||
-        session?.step ===
-          SESSION_STEPS.READY_TO_PUBLISH ||
-        session?.step ===
-          SESSION_STEPS.PUBLISHING
-      ) {
-        await ctx.reply(
-          [
-            "Сейчас уже готовится другая публикация.",
-            "",
-            "Используйте кнопки под сообщением или команду /cancel.",
-          ].join("\n")
-        );
-
-        return;
-      }
-
-      if (sourceText.length < 20) {
-        await ctx.reply(
-          "Текст слишком короткий. Пришлите полноценную новость или заметку."
-        );
-
-        return;
-      }
-
-      const processingMessage =
-        await ctx.reply(
-          "⏳ Обрабатываю текст и готовлю статью..."
-        );
-
-      try {
-        const article =
-          await aiService.createArticle(
-            sourceText
-          );
-
-        setPublicationSession(ctx, {
-          step:
-            SESSION_STEPS.WAITING_IMAGE,
-          sourceText,
-          article,
-          imageUrl: null,
-          category: null,
-          createdAt: new Date(),
-        });
-
-        const formattedArticle =
-          formatArticle(article);
-
-        await sendLongMessage(
-          ctx,
-          formattedArticle,
-          {
-            reply_markup:
-              getArticleActionsKeyboard(),
-          }
-        );
-
-        await safelyDeleteMessage(
-          ctx,
-          processingMessage
-        );
-
-        await ctx.reply(
-          "Теперь пришлите ссылку на изображение для обложки."
-        );
-      } catch (error) {
-        console.error(
-          "Telegram AI article generation failed:",
-          error
-        );
-
-        await safelyDeleteMessage(
-          ctx,
-          processingMessage
-        );
-
-        let message =
-          "Не удалось подготовить статью.";
-
-        if (
-          error.status === 429 ||
-          String(error.message).includes("429")
-        ) {
-          message =
-            "OpenAI временно отклонил запрос из-за лимита или отсутствия доступного баланса.";
-        } else if (
-          error.status === 401 ||
-          String(error.message).includes("401")
-        ) {
-          message =
-            "Ошибка авторизации OpenAI. Проверьте API-ключ.";
-        } else if (error.message) {
-          message += `\n\nОшибка: ${error.message}`;
-        }
-
-        await ctx.reply(`❌ ${message}`);
-      }
-    }
-  );
-
-  telegramBot.on(
-    "message",
-    async (ctx) => {
-      const session =
-        getPublicationSession(ctx);
-
-      if (
-        session?.step ===
-        SESSION_STEPS.WAITING_IMAGE
-      ) {
-        await ctx.reply(
-          "Пришлите ссылку на изображение обычным текстовым сообщением."
-        );
-
-        return;
-      }
-
+    if (sourceText.length < 20) {
       await ctx.reply(
-        "Пока я обрабатываю только текстовые сообщения. Пришлите текст новости."
+        "Текст слишком короткий. Пришлите полноценную новость или заметку.",
       );
+
+      return;
     }
-  );
+
+    const processingMessage = await ctx.reply(
+      "⏳ Обрабатываю текст и готовлю статью...",
+    );
+
+    try {
+      const article = await aiService.createArticle(sourceText);
+
+      const uzArticle = await aiService.translateArticleToUzbek(article);
+
+      setPublicationSession(ctx, {
+        step: SESSION_STEPS.WAITING_IMAGE,
+        sourceText,
+        article,
+        uzArticle,
+        imageUrl: null,
+        category: null,
+        createdAt: new Date(),
+      });
+
+      const formattedArticle = formatArticle(article);
+
+      await sendLongMessage(ctx, formattedArticle, {
+        reply_markup: getArticleActionsKeyboard(),
+      });
+
+      await safelyDeleteMessage(ctx, processingMessage);
+
+      await ctx.reply("Теперь пришлите ссылку на изображение для обложки.");
+    } catch (error) {
+      console.error("Telegram AI article generation failed:", error);
+
+      await safelyDeleteMessage(ctx, processingMessage);
+
+      let message = "Не удалось подготовить статью.";
+
+      if (error.status === 429 || String(error.message).includes("429")) {
+        message =
+          "OpenAI временно отклонил запрос из-за лимита или отсутствия доступного баланса.";
+      } else if (
+        error.status === 401 ||
+        String(error.message).includes("401")
+      ) {
+        message = "Ошибка авторизации OpenAI. Проверьте API-ключ.";
+      } else if (error.message) {
+        message += `\n\nОшибка: ${error.message}`;
+      }
+
+      await ctx.reply(`❌ ${message}`);
+    }
+  });
+
+  telegramBot.on("message", async (ctx) => {
+    const session = getPublicationSession(ctx);
+
+    if (session?.step === SESSION_STEPS.WAITING_IMAGE) {
+      await ctx.reply(
+        "Пришлите ссылку на изображение обычным текстовым сообщением.",
+      );
+
+      return;
+    }
+
+    await ctx.reply(
+      "Пока я обрабатываю только текстовые сообщения. Пришлите текст новости.",
+    );
+  });
 
   return telegramBot;
 }
@@ -1038,15 +875,11 @@ export function getTelegramBot() {
 export async function startTelegramBot() {
   const bot = getTelegramBot();
 
-  console.log(
-    "Telegram bot is starting..."
-  );
+  console.log("Telegram bot is starting...");
 
   await bot.start({
     onStart: (botInfo) => {
-      console.log(
-        `Telegram bot @${botInfo.username} started`
-      );
+      console.log(`Telegram bot @${botInfo.username} started`);
     },
   });
 }
