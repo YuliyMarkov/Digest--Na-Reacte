@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
+import aiService from "../services/ai.service.js";
 
 const router = Router();
 
@@ -16,6 +17,7 @@ router.get("/db-test", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       ok: false,
       message: "Database request failed",
@@ -33,8 +35,47 @@ router.get("/users", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       ok: false,
+    });
+  }
+});
+
+router.get("/prompt", async (req, res) => {
+  try {
+    const prompt = await aiService.getCreateArticlePrompt();
+
+    res.json({
+      ok: true,
+      prompt,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      ok: false,
+      error: error.message,
+    });
+  }
+});
+
+router.post("/ai-article", async (req, res) => {
+  try {
+    const { text } = req.body;
+
+    const article = await aiService.createArticle(text);
+
+    res.json({
+      ok: true,
+      article,
+    });
+  } catch (error) {
+    console.error("AI article test failed:", error);
+
+    res.status(500).json({
+      ok: false,
+      error: error.message,
     });
   }
 });
