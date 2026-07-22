@@ -111,6 +111,60 @@ function isValidHttpUrl(value) {
 }
 
 /**
+ * Экранирует специальные HTML-символы.
+ * Это не позволяет тексту от AI случайно превратиться в HTML-разметку.
+ */
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/**
+ * Преобразует обычный текст с абзацами в HTML,
+ * который используется редактором и страницей статьи.
+ *
+ * Пустая строка между фрагментами создаёт новый <p>.
+ * Одинарный перенос внутри абзаца превращается в <br>.
+ */
+function plainTextToHtml(value) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  const normalizedText = value
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .trim();
+
+  if (!normalizedText) {
+    return "";
+  }
+
+  /**
+   * Не оборачиваем контент повторно, если AI или редактор
+   * уже вернул полноценную HTML-разметку.
+   */
+  if (
+    /<(?:p|div|h[1-6]|ul|ol|li|blockquote|br)\b[^>]*>/i.test(normalizedText)
+  ) {
+    return normalizedText;
+  }
+
+  return normalizedText
+    .split(/\n\s*\n+/)
+    .map((paragraph) => {
+      const paragraphHtml = escapeHtml(paragraph.trim()).replace(/\n/g, "<br>");
+
+      return `<p>${paragraphHtml}</p>`;
+    })
+    .join("\n");
+}
+
+/**
  * Простая транслитерация русского заголовка в slug.
  */
 function transliterate(value) {
@@ -536,9 +590,7 @@ async function publishArticle(ctx) {
     text: "Публикую статью...",
   });
 
-  const processingMessage = await ctx.reply(
-    "⏳ Публикую новость на сайте...",
-  );
+  const processingMessage = await ctx.reply("⏳ Публикую новость на сайте...");
 
   try {
     const authorId = getArticleAuthorId();
@@ -557,7 +609,7 @@ async function publishArticle(ctx) {
       ru: {
         title: session.article.title,
         excerpt: session.article.excerpt || null,
-        content: session.article.content,
+        content: plainTextToHtml(session.article.content),
         seoTitle: session.article.seoTitle || null,
         seoDescription: session.article.seoDescription || null,
         telegramEmbedUrl: null,
@@ -568,7 +620,7 @@ async function publishArticle(ctx) {
         ? {
             title: session.uzArticle.title,
             excerpt: session.uzArticle.excerpt || null,
-            content: session.uzArticle.content,
+            content: plainTextToHtml(session.uzArticle.content),
             seoTitle: session.uzArticle.seoTitle || null,
             seoDescription: session.uzArticle.seoDescription || null,
             telegramEmbedUrl: null,
@@ -614,8 +666,7 @@ async function publishArticle(ctx) {
     let message = "Не удалось опубликовать статью.";
 
     if (error.code === "AUTHOR_NOT_FOUND") {
-      message =
-        "Автор статьи не найден. Проверьте TELEGRAM_ARTICLE_AUTHOR_ID.";
+      message = "Автор статьи не найден. Проверьте TELEGRAM_ARTICLE_AUTHOR_ID.";
     } else if (error.code === "CATEGORY_NOT_FOUND") {
       message = "Выбранная категория больше не существует.";
     } else if (error.code === "SLUG_ALREADY_EXISTS") {
