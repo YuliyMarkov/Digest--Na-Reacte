@@ -632,7 +632,7 @@ async function publishArticle(ctx) {
     deletePublicationSession(ctx);
     await safelyDeleteMessage(ctx, processingMessage);
 
-    const articleUrl = `${getPublicSiteUrl()}/news/${publishedArticle.slug}`;
+    const articleUrl = `${getPublicSiteUrl()}/ru/news/${publishedArticle.slug}`;
 
     await ctx.reply(
       [
