@@ -199,11 +199,14 @@ function getCategoryDisplayName(category) {
   return category.nameRu || category.slug || `Категория ${category.id}`;
 }
 
+/**
+ * Форматирует русскую версию статьи для показа в Telegram.
+ */
 function formatArticle(article) {
   const breakingStatus = article.isBreaking ? "Да" : "Нет";
 
   return [
-    "✅ Статья подготовлена",
+    "✅ Русская версия статьи подготовлена",
     "",
     "📰 Заголовок:",
     article.title,
@@ -224,7 +227,39 @@ function formatArticle(article) {
   ].join("\n");
 }
 
+/**
+ * Форматирует узбекскую версию статьи для показа в Telegram.
+ */
+function formatUzbekArticle(article) {
+  const breakingStatus = article.isBreaking ? "Ha" : "Yo‘q";
+
+  return [
+    "🇺🇿 O‘zbekcha versiya tayyor",
+    "",
+    "📰 Sarlavha:",
+    article.title,
+    "",
+    "📝 Qisqacha tavsif:",
+    article.excerpt || "Ko‘rsatilmagan",
+    "",
+    "📄 Maqola matni:",
+    article.content,
+    "",
+    "🔎 SEO sarlavha:",
+    article.seoTitle || "Ko‘rsatilmagan",
+    "",
+    "📌 SEO tavsifi:",
+    article.seoDescription || "Ko‘rsatilmagan",
+    "",
+    `🚨 Shoshilinch yangilik: ${breakingStatus}`,
+  ].join("\n");
+}
+
 function formatPublicationPreview(session) {
+  const translationStatus = session.uzArticle
+    ? "✅ Узбекская версия готова"
+    : "⚠️ Узбекская версия не создана";
+
   return [
     "✅ Всё готово к публикации",
     "",
@@ -234,11 +269,15 @@ function formatPublicationPreview(session) {
     "📝 Краткое описание:",
     session.article.excerpt || "Не указано",
     "",
+    `🇺🇿 Перевод: ${translationStatus}`,
+    "",
     `🖼 Обложка: ${session.imageUrl}`,
     "",
     `📂 Категория: ${session.category.nameRu}`,
     "",
-    "Новость будет сразу опубликована на сайте.",
+    session.uzArticle
+      ? "Новость будет опубликована на русском и узбекском языках."
+      : "Новость будет опубликована только на русском языке.",
   ].join("\n");
 }
 
@@ -288,22 +327,47 @@ async function safelyDeleteMessage(ctx, message) {
   }
 }
 
-function getArticleActionsKeyboard() {
-  return new InlineKeyboard()
+/**
+ * Кнопки, которые отображаются после подготовки статьи.
+ */
+function getArticleActionsKeyboard(hasUzbekTranslation = false) {
+  const keyboard = new InlineKeyboard();
+
+  keyboard
+    .text(
+      hasUzbekTranslation
+        ? "🔄 Перевести на узбекский заново"
+        : "🌍 Перевести на узбекский",
+      "article:translate_uz",
+    )
+    .row()
     .text("➡️ Добавить обложку", "article:add_image")
     .row()
     .text("❌ Отмена", "article:cancel");
+
+  return keyboard;
 }
 
-function getReadyToPublishKeyboard() {
-  return new InlineKeyboard()
+function getReadyToPublishKeyboard(hasUzbekTranslation = false) {
+  const keyboard = new InlineKeyboard()
     .text("🚀 Опубликовать", "article:publish")
+    .row();
+
+  keyboard
+    .text(
+      hasUzbekTranslation
+        ? "🔄 Перевести UZ заново"
+        : "🌍 Добавить перевод UZ",
+      "article:translate_uz",
+    )
     .row()
     .text("🖼 Сменить картинку", "article:change_image")
     .row()
     .text("📂 Сменить категорию", "article:change_category")
     .row()
     .text("❌ Отмена", "article:cancel");
+
+  return keyboard;
 }
 
 function getCategoriesKeyboard(categories) {
@@ -410,7 +474,7 @@ async function showPublicationPreview(ctx) {
   setPublicationSession(ctx, session);
 
   await ctx.reply(formatPublicationPreview(session), {
-    reply_markup: getReadyToPublishKeyboard(),
+    reply_markup: getReadyToPublishKeyboard(Boolean(session.uzArticle)),
   });
 }
 
@@ -450,7 +514,9 @@ async function publishArticle(ctx) {
     text: "Публикую статью...",
   });
 
-  const processingMessage = await ctx.reply("⏳ Публикую новость на сайте...");
+  const processingMessage = await ctx.reply(
+    "⏳ Публикую новость на сайте...",
+  );
 
   try {
     const authorId = getArticleAuthorId();
@@ -477,17 +543,16 @@ async function publishArticle(ctx) {
       },
 
       uz: session.uzArticle
-  ? {
-      title: session.uzArticle.title,
-      excerpt: session.uzArticle.excerpt || null,
-      content: session.uzArticle.content,
-      seoTitle: session.uzArticle.seoTitle || null,
-      seoDescription:
-        session.uzArticle.seoDescription || null,
-      telegramEmbedUrl: null,
-      youtubeEmbedUrl: null,
-    }
-  : null,
+        ? {
+            title: session.uzArticle.title,
+            excerpt: session.uzArticle.excerpt || null,
+            content: session.uzArticle.content,
+            seoTitle: session.uzArticle.seoTitle || null,
+            seoDescription: session.uzArticle.seoDescription || null,
+            telegramEmbedUrl: null,
+            youtubeEmbedUrl: null,
+          }
+        : null,
     });
 
     deletePublicationSession(ctx);
@@ -503,6 +568,10 @@ async function publishArticle(ctx) {
           (translation) => translation.locale === "ru",
         )?.title || session.article.title,
         "",
+        session.uzArticle
+          ? "🇷🇺 Русская и 🇺🇿 узбекская версии опубликованы"
+          : "🇷🇺 Опубликована только русская версия",
+        "",
         `🔗 ${articleUrl}`,
       ].join("\n"),
       {
@@ -516,7 +585,6 @@ async function publishArticle(ctx) {
     console.error("Telegram article publication failed:", error);
 
     session.step = SESSION_STEPS.READY_TO_PUBLISH;
-
     setPublicationSession(ctx, session);
 
     await safelyDeleteMessage(ctx, processingMessage);
@@ -524,7 +592,8 @@ async function publishArticle(ctx) {
     let message = "Не удалось опубликовать статью.";
 
     if (error.code === "AUTHOR_NOT_FOUND") {
-      message = "Автор статьи не найден. Проверьте TELEGRAM_ARTICLE_AUTHOR_ID.";
+      message =
+        "Автор статьи не найден. Проверьте TELEGRAM_ARTICLE_AUTHOR_ID.";
     } else if (error.code === "CATEGORY_NOT_FOUND") {
       message = "Выбранная категория больше не существует.";
     } else if (error.code === "SLUG_ALREADY_EXISTS") {
@@ -535,7 +604,9 @@ async function publishArticle(ctx) {
     }
 
     await ctx.reply(`❌ ${message}`, {
-      reply_markup: getReadyToPublishKeyboard(),
+      reply_markup: getReadyToPublishKeyboard(
+        Boolean(session.uzArticle),
+      ),
     });
   }
 }
@@ -622,6 +693,118 @@ export function getTelegramBot() {
         "Можете отправить текст новой новости.",
       ].join("\n"),
     );
+  });
+
+  /**
+   * Перевод готовой русской статьи на узбекский язык.
+   */
+  telegramBot.callbackQuery("article:translate_uz", async (ctx) => {
+    const session = getPublicationSession(ctx);
+
+    if (!session?.article) {
+      await ctx.answerCallbackQuery({
+        text: "Сессия не найдена. Отправьте новость заново.",
+        show_alert: true,
+      });
+
+      return;
+    }
+
+    if (session.step === SESSION_STEPS.PUBLISHING) {
+      await ctx.answerCallbackQuery({
+        text: "Сейчас выполняется публикация.",
+        show_alert: true,
+      });
+
+      return;
+    }
+
+    if (session.isTranslating) {
+      await ctx.answerCallbackQuery({
+        text: "Перевод уже выполняется.",
+      });
+
+      return;
+    }
+
+    session.isTranslating = true;
+    setPublicationSession(ctx, session);
+
+    await ctx.answerCallbackQuery({
+      text: session.uzArticle
+        ? "Перевожу статью заново..."
+        : "Перевожу статью...",
+    });
+
+    const processingMessage = await ctx.reply(
+      "⏳ Перевожу статью на узбекский язык...",
+    );
+
+    try {
+      const uzArticle = await aiService.translateArticleToUzbek(
+        session.article,
+      );
+
+      session.uzArticle = uzArticle;
+      session.isTranslating = false;
+
+      setPublicationSession(ctx, session);
+
+      await safelyDeleteMessage(ctx, processingMessage);
+
+      const keyboard =
+        session.step === SESSION_STEPS.READY_TO_PUBLISH
+          ? getReadyToPublishKeyboard(true)
+          : getArticleActionsKeyboard(true);
+
+      await sendLongMessage(ctx, formatUzbekArticle(uzArticle), {
+        reply_markup: keyboard,
+      });
+
+      if (session.step === SESSION_STEPS.READY_TO_PUBLISH) {
+        await ctx.reply(
+          "✅ Перевод сохранён. Теперь можно публиковать обе версии статьи.",
+        );
+      } else {
+        await ctx.reply(
+          [
+            "✅ Перевод сохранён.",
+            "",
+            "Теперь можно добавить обложку и продолжить публикацию.",
+          ].join("\n"),
+        );
+      }
+    } catch (error) {
+      console.error("Uzbek translation failed:", error);
+
+      session.isTranslating = false;
+      setPublicationSession(ctx, session);
+
+      await safelyDeleteMessage(ctx, processingMessage);
+
+      let message = "Не удалось перевести статью на узбекский язык.";
+
+      if (error.status === 429 || String(error.message).includes("429")) {
+        message =
+          "OpenAI временно отклонил запрос из-за лимита или отсутствия доступного баланса.";
+      } else if (
+        error.status === 401 ||
+        String(error.message).includes("401")
+      ) {
+        message = "Ошибка авторизации OpenAI. Проверьте API-ключ.";
+      } else if (error.message) {
+        message += `\n\nОшибка: ${error.message}`;
+      }
+
+      const keyboard =
+        session.step === SESSION_STEPS.READY_TO_PUBLISH
+          ? getReadyToPublishKeyboard(Boolean(session.uzArticle))
+          : getArticleActionsKeyboard(Boolean(session.uzArticle));
+
+      await ctx.reply(`❌ ${message}`, {
+        reply_markup: keyboard,
+      });
+    }
   });
 
   telegramBot.callbackQuery("article:add_image", async (ctx) => {
@@ -755,6 +938,8 @@ export function getTelegramBot() {
             "❌ Это не похоже на корректную ссылку.",
             "",
             "Пришлите публичную ссылку, начинающуюся с http:// или https://",
+            "",
+            "Либо используйте кнопки под статьёй.",
           ].join("\n"),
         );
 
@@ -814,33 +999,43 @@ export function getTelegramBot() {
     }
 
     const processingMessage = await ctx.reply(
-      "⏳ Обрабатываю текст и готовлю статью...",
+      "⏳ Обрабатываю текст и готовлю русскую версию статьи...",
     );
 
     try {
+      /**
+       * На этом этапе создаётся только русская версия.
+       * Узбекский перевод запускается отдельно по кнопке.
+       */
       const article = await aiService.createArticle(sourceText);
-
-      const uzArticle = await aiService.translateArticleToUzbek(article);
 
       setPublicationSession(ctx, {
         step: SESSION_STEPS.WAITING_IMAGE,
         sourceText,
         article,
-        uzArticle,
+        uzArticle: null,
         imageUrl: null,
         category: null,
+        isTranslating: false,
         createdAt: new Date(),
       });
 
       const formattedArticle = formatArticle(article);
 
       await sendLongMessage(ctx, formattedArticle, {
-        reply_markup: getArticleActionsKeyboard(),
+        reply_markup: getArticleActionsKeyboard(false),
       });
 
       await safelyDeleteMessage(ctx, processingMessage);
 
-      await ctx.reply("Теперь пришлите ссылку на изображение для обложки.");
+      await ctx.reply(
+        [
+          "Русская версия готова.",
+          "",
+          "Нажмите «Перевести на узбекский», чтобы создать и проверить перевод.",
+          "После этого можно перейти к добавлению обложки.",
+        ].join("\n"),
+      );
     } catch (error) {
       console.error("Telegram AI article generation failed:", error);
 
