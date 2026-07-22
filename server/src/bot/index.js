@@ -15,8 +15,14 @@ const publicationSessions = new Map();
 
 const SESSION_STEPS = {
   WAITING_IMAGE: "WAITING_IMAGE",
+
   WAITING_CATEGORY: "WAITING_CATEGORY",
+
+  WAITING_RU_EDIT: "WAITING_RU_EDIT",
+  WAITING_UZ_EDIT: "WAITING_UZ_EDIT",
+
   READY_TO_PUBLISH: "READY_TO_PUBLISH",
+
   PUBLISHING: "PUBLISHING",
 };
 
@@ -330,41 +336,67 @@ async function safelyDeleteMessage(ctx, message) {
 /**
  * Кнопки, которые отображаются после подготовки статьи.
  */
-function getArticleActionsKeyboard(hasUzbekTranslation = false) {
+function getReadyToPublishKeyboard(hasUzbekTranslation = false) {
   const keyboard = new InlineKeyboard();
 
   keyboard
+    .text("🚀 Опубликовать", "article:publish")
+    .row()
+
     .text(
-      hasUzbekTranslation
-        ? "🔄 Перевести на узбекский заново"
-        : "🌍 Перевести на узбекский",
+      hasUzbekTranslation ? "🔄 Перевести UZ заново" : "🌍 Добавить перевод UZ",
       "article:translate_uz",
     )
     .row()
-    .text("➡️ Добавить обложку", "article:add_image")
+
+    .text("✏️ Изменить RU", "article:edit_ru");
+
+  if (hasUzbekTranslation) {
+    keyboard.text("✏️ Изменить UZ", "article:edit_uz").row();
+  } else {
+    keyboard.row();
+  }
+
+  keyboard
+    .text("🖼 Сменить картинку", "article:change_image")
     .row()
+
+    .text("📂 Сменить категорию", "article:change_category")
+    .row()
+
     .text("❌ Отмена", "article:cancel");
 
   return keyboard;
 }
 
 function getReadyToPublishKeyboard(hasUzbekTranslation = false) {
-  const keyboard = new InlineKeyboard()
-    .text("🚀 Опубликовать", "article:publish")
-    .row();
+  const keyboard = new InlineKeyboard();
 
   keyboard
+    .text("🚀 Опубликовать", "article:publish")
+    .row()
+
     .text(
-      hasUzbekTranslation
-        ? "🔄 Перевести UZ заново"
-        : "🌍 Добавить перевод UZ",
+      hasUzbekTranslation ? "🔄 Перевести UZ заново" : "🌍 Добавить перевод UZ",
       "article:translate_uz",
     )
     .row()
+
+    .text("✏️ Изменить RU", "article:edit_ru");
+
+  if (hasUzbekTranslation) {
+    keyboard.text("✏️ Изменить UZ", "article:edit_uz").row();
+  } else {
+    keyboard.row();
+  }
+
+  keyboard
     .text("🖼 Сменить картинку", "article:change_image")
     .row()
+
     .text("📂 Сменить категорию", "article:change_category")
     .row()
+
     .text("❌ Отмена", "article:cancel");
 
   return keyboard;
@@ -514,9 +546,7 @@ async function publishArticle(ctx) {
     text: "Публикую статью...",
   });
 
-  const processingMessage = await ctx.reply(
-    "⏳ Публикую новость на сайте...",
-  );
+  const processingMessage = await ctx.reply("⏳ Публикую новость на сайте...");
 
   try {
     const authorId = getArticleAuthorId();
@@ -592,8 +622,7 @@ async function publishArticle(ctx) {
     let message = "Не удалось опубликовать статью.";
 
     if (error.code === "AUTHOR_NOT_FOUND") {
-      message =
-        "Автор статьи не найден. Проверьте TELEGRAM_ARTICLE_AUTHOR_ID.";
+      message = "Автор статьи не найден. Проверьте TELEGRAM_ARTICLE_AUTHOR_ID.";
     } else if (error.code === "CATEGORY_NOT_FOUND") {
       message = "Выбранная категория больше не существует.";
     } else if (error.code === "SLUG_ALREADY_EXISTS") {
@@ -604,9 +633,7 @@ async function publishArticle(ctx) {
     }
 
     await ctx.reply(`❌ ${message}`, {
-      reply_markup: getReadyToPublishKeyboard(
-        Boolean(session.uzArticle),
-      ),
+      reply_markup: getReadyToPublishKeyboard(Boolean(session.uzArticle)),
     });
   }
 }
@@ -807,6 +834,59 @@ export function getTelegramBot() {
     }
   });
 
+  telegramBot.callbackQuery("article:edit_ru", async (ctx) => {
+    const session = getPublicationSession(ctx);
+
+    if (!session?.article) {
+      await ctx.answerCallbackQuery({
+        text: "Сессия не найдена.",
+        show_alert: true,
+      });
+
+      return;
+    }
+
+    session.step = SESSION_STEPS.WAITING_RU_EDIT;
+
+    setPublicationSession(ctx, session);
+
+    await ctx.answerCallbackQuery();
+
+    await ctx.reply(
+      [
+        "✏️ Что нужно изменить в русской версии?",
+        "",
+        "Например:",
+        "• сократи текст",
+        "• перепиши заголовок",
+        "• сделай спокойнее",
+        "• исправь ошибки",
+        "• сделай SEO лучше",
+      ].join("\n"),
+    );
+  });
+
+  telegramBot.callbackQuery("article:edit_uz", async (ctx) => {
+    const session = getPublicationSession(ctx);
+
+    if (!session?.uzArticle) {
+      await ctx.answerCallbackQuery({
+        text: "Сначала создайте перевод.",
+        show_alert: true,
+      });
+
+      return;
+    }
+
+    session.step = SESSION_STEPS.WAITING_UZ_EDIT;
+
+    setPublicationSession(ctx, session);
+
+    await ctx.answerCallbackQuery();
+
+    await ctx.reply("✏️ Напишите, что нужно изменить в узбекской версии.");
+  });
+
   telegramBot.callbackQuery("article:add_image", async (ctx) => {
     await ctx.answerCallbackQuery();
     await askForImageUrl(ctx);
@@ -925,6 +1005,102 @@ export function getTelegramBot() {
     }
 
     const session = getPublicationSession(ctx);
+
+    if (session?.step === SESSION_STEPS.WAITING_RU_EDIT) {
+      const processingMessage = await ctx.reply(
+        "⏳ Редактирую русскую версию...",
+      );
+
+      try {
+        const article = await aiService.editArticle(
+          session.article,
+          sourceText,
+        );
+
+        session.article = article;
+
+        session.step =
+          session.imageUrl && session.category
+            ? SESSION_STEPS.READY_TO_PUBLISH
+            : SESSION_STEPS.WAITING_IMAGE;
+
+        setPublicationSession(ctx, session);
+
+        await safelyDeleteMessage(ctx, processingMessage);
+
+        await sendLongMessage(ctx, formatArticle(article), {
+          reply_markup:
+            session.step === SESSION_STEPS.READY_TO_PUBLISH
+              ? getReadyToPublishKeyboard(Boolean(session.uzArticle))
+              : getArticleActionsKeyboard(Boolean(session.uzArticle)),
+        });
+
+        return;
+      } catch (error) {
+        console.error(error);
+
+        session.step =
+          session.imageUrl && session.category
+            ? SESSION_STEPS.READY_TO_PUBLISH
+            : SESSION_STEPS.WAITING_IMAGE;
+
+        setPublicationSession(ctx, session);
+
+        await safelyDeleteMessage(ctx, processingMessage);
+
+        await ctx.reply(`❌ Не удалось изменить статью.\n\n${error.message}`);
+
+        return;
+      }
+    }
+
+    if (session?.step === SESSION_STEPS.WAITING_UZ_EDIT) {
+      const processingMessage = await ctx.reply(
+        "⏳ Редактирую узбекскую версию...",
+      );
+
+      try {
+        const article = await aiService.editUzbekArticle(
+          session.uzArticle,
+          sourceText,
+        );
+
+        session.uzArticle = article;
+
+        session.step =
+          session.imageUrl && session.category
+            ? SESSION_STEPS.READY_TO_PUBLISH
+            : SESSION_STEPS.WAITING_IMAGE;
+
+        setPublicationSession(ctx, session);
+
+        await safelyDeleteMessage(ctx, processingMessage);
+
+        await sendLongMessage(ctx, formatUzbekArticle(article), {
+          reply_markup:
+            session.step === SESSION_STEPS.READY_TO_PUBLISH
+              ? getReadyToPublishKeyboard(true)
+              : getArticleActionsKeyboard(true),
+        });
+
+        return;
+      } catch (error) {
+        console.error(error);
+
+        session.step =
+          session.imageUrl && session.category
+            ? SESSION_STEPS.READY_TO_PUBLISH
+            : SESSION_STEPS.WAITING_IMAGE;
+
+        setPublicationSession(ctx, session);
+
+        await safelyDeleteMessage(ctx, processingMessage);
+
+        await ctx.reply(`❌ Не удалось изменить перевод.\n\n${error.message}`);
+
+        return;
+      }
+    }
 
     /**
      * Бот ожидает ссылку на обложку.
