@@ -476,7 +476,18 @@ async function publishArticle(ctx) {
         youtubeEmbedUrl: null,
       },
 
-      uz: null,
+      uz: session.uzArticle
+  ? {
+      title: session.uzArticle.title,
+      excerpt: session.uzArticle.excerpt || null,
+      content: session.uzArticle.content,
+      seoTitle: session.uzArticle.seoTitle || null,
+      seoDescription:
+        session.uzArticle.seoDescription || null,
+      telegramEmbedUrl: null,
+      youtubeEmbedUrl: null,
+    }
+  : null,
     });
 
     deletePublicationSession(ctx);
