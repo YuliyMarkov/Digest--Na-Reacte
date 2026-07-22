@@ -15,14 +15,10 @@ const publicationSessions = new Map();
 
 const SESSION_STEPS = {
   WAITING_IMAGE: "WAITING_IMAGE",
-
   WAITING_CATEGORY: "WAITING_CATEGORY",
-
   WAITING_RU_EDIT: "WAITING_RU_EDIT",
   WAITING_UZ_EDIT: "WAITING_UZ_EDIT",
-
   READY_TO_PUBLISH: "READY_TO_PUBLISH",
-
   PUBLISHING: "PUBLISHING",
 };
 
@@ -44,7 +40,6 @@ function getAllowedUserIds() {
 function isUserAllowed(ctx) {
   const allowedUserIds = getAllowedUserIds();
 
-  // Если список пустой, доступ закрыт для всех.
   if (allowedUserIds.length === 0) {
     return false;
   }
@@ -334,7 +329,39 @@ async function safelyDeleteMessage(ctx, message) {
 }
 
 /**
- * Кнопки, которые отображаются после подготовки статьи.
+ * Кнопки, которые отображаются сразу после подготовки статьи,
+ * до добавления обложки и выбора категории.
+ */
+function getArticleActionsKeyboard(hasUzbekTranslation = false) {
+  const keyboard = new InlineKeyboard();
+
+  keyboard
+    .text(
+      hasUzbekTranslation
+        ? "🔄 Перевести на узбекский заново"
+        : "🌍 Перевести на узбекский",
+      "article:translate_uz",
+    )
+    .row()
+    .text("✏️ Изменить RU", "article:edit_ru");
+
+  if (hasUzbekTranslation) {
+    keyboard.text("✏️ Изменить UZ", "article:edit_uz").row();
+  } else {
+    keyboard.row();
+  }
+
+  keyboard
+    .text("➡️ Добавить обложку", "article:add_image")
+    .row()
+    .text("❌ Отмена", "article:cancel");
+
+  return keyboard;
+}
+
+/**
+ * Кнопки, которые отображаются после добавления обложки
+ * и выбора категории.
  */
 function getReadyToPublishKeyboard(hasUzbekTranslation = false) {
   const keyboard = new InlineKeyboard();
@@ -342,13 +369,11 @@ function getReadyToPublishKeyboard(hasUzbekTranslation = false) {
   keyboard
     .text("🚀 Опубликовать", "article:publish")
     .row()
-
     .text(
       hasUzbekTranslation ? "🔄 Перевести UZ заново" : "🌍 Добавить перевод UZ",
       "article:translate_uz",
     )
     .row()
-
     .text("✏️ Изменить RU", "article:edit_ru");
 
   if (hasUzbekTranslation) {
@@ -360,10 +385,8 @@ function getReadyToPublishKeyboard(hasUzbekTranslation = false) {
   keyboard
     .text("🖼 Сменить картинку", "article:change_image")
     .row()
-
     .text("📂 Сменить категорию", "article:change_category")
     .row()
-
     .text("❌ Отмена", "article:cancel");
 
   return keyboard;
@@ -513,7 +536,9 @@ async function publishArticle(ctx) {
     text: "Публикую статью...",
   });
 
-  const processingMessage = await ctx.reply("⏳ Публикую новость на сайте...");
+  const processingMessage = await ctx.reply(
+    "⏳ Публикую новость на сайте...",
+  );
 
   try {
     const authorId = getArticleAuthorId();
@@ -589,7 +614,8 @@ async function publishArticle(ctx) {
     let message = "Не удалось опубликовать статью.";
 
     if (error.code === "AUTHOR_NOT_FOUND") {
-      message = "Автор статьи не найден. Проверьте TELEGRAM_ARTICLE_AUTHOR_ID.";
+      message =
+        "Автор статьи не найден. Проверьте TELEGRAM_ARTICLE_AUTHOR_ID.";
     } else if (error.code === "CATEGORY_NOT_FOUND") {
       message = "Выбранная категория больше не существует.";
     } else if (error.code === "SLUG_ALREADY_EXISTS") {
@@ -813,8 +839,16 @@ export function getTelegramBot() {
       return;
     }
 
-    session.step = SESSION_STEPS.WAITING_RU_EDIT;
+    if (session.step === SESSION_STEPS.PUBLISHING) {
+      await ctx.answerCallbackQuery({
+        text: "Сейчас выполняется публикация.",
+        show_alert: true,
+      });
 
+      return;
+    }
+
+    session.step = SESSION_STEPS.WAITING_RU_EDIT;
     setPublicationSession(ctx, session);
 
     await ctx.answerCallbackQuery();
@@ -845,8 +879,16 @@ export function getTelegramBot() {
       return;
     }
 
-    session.step = SESSION_STEPS.WAITING_UZ_EDIT;
+    if (session.step === SESSION_STEPS.PUBLISHING) {
+      await ctx.answerCallbackQuery({
+        text: "Сейчас выполняется публикация.",
+        show_alert: true,
+      });
 
+      return;
+    }
+
+    session.step = SESSION_STEPS.WAITING_UZ_EDIT;
     setPublicationSession(ctx, session);
 
     await ctx.answerCallbackQuery();
@@ -1004,7 +1046,7 @@ export function getTelegramBot() {
 
         return;
       } catch (error) {
-        console.error(error);
+        console.error("Russian article editing failed:", error);
 
         session.step =
           session.imageUrl && session.category
@@ -1015,7 +1057,19 @@ export function getTelegramBot() {
 
         await safelyDeleteMessage(ctx, processingMessage);
 
-        await ctx.reply(`❌ Не удалось изменить статью.\n\n${error.message}`);
+        await ctx.reply(
+          [
+            "❌ Не удалось изменить статью.",
+            "",
+            error.message || "Неизвестная ошибка",
+          ].join("\n"),
+          {
+            reply_markup:
+              session.step === SESSION_STEPS.READY_TO_PUBLISH
+                ? getReadyToPublishKeyboard(Boolean(session.uzArticle))
+                : getArticleActionsKeyboard(Boolean(session.uzArticle)),
+          },
+        );
 
         return;
       }
@@ -1052,7 +1106,7 @@ export function getTelegramBot() {
 
         return;
       } catch (error) {
-        console.error(error);
+        console.error("Uzbek article editing failed:", error);
 
         session.step =
           session.imageUrl && session.category
@@ -1063,7 +1117,19 @@ export function getTelegramBot() {
 
         await safelyDeleteMessage(ctx, processingMessage);
 
-        await ctx.reply(`❌ Не удалось изменить перевод.\n\n${error.message}`);
+        await ctx.reply(
+          [
+            "❌ Не удалось изменить перевод.",
+            "",
+            error.message || "Неизвестная ошибка",
+          ].join("\n"),
+          {
+            reply_markup:
+              session.step === SESSION_STEPS.READY_TO_PUBLISH
+                ? getReadyToPublishKeyboard(true)
+                : getArticleActionsKeyboard(true),
+          },
+        );
 
         return;
       }
