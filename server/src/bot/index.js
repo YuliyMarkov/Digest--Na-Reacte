@@ -369,39 +369,6 @@ function getReadyToPublishKeyboard(hasUzbekTranslation = false) {
   return keyboard;
 }
 
-function getReadyToPublishKeyboard(hasUzbekTranslation = false) {
-  const keyboard = new InlineKeyboard();
-
-  keyboard
-    .text("🚀 Опубликовать", "article:publish")
-    .row()
-
-    .text(
-      hasUzbekTranslation ? "🔄 Перевести UZ заново" : "🌍 Добавить перевод UZ",
-      "article:translate_uz",
-    )
-    .row()
-
-    .text("✏️ Изменить RU", "article:edit_ru");
-
-  if (hasUzbekTranslation) {
-    keyboard.text("✏️ Изменить UZ", "article:edit_uz").row();
-  } else {
-    keyboard.row();
-  }
-
-  keyboard
-    .text("🖼 Сменить картинку", "article:change_image")
-    .row()
-
-    .text("📂 Сменить категорию", "article:change_category")
-    .row()
-
-    .text("❌ Отмена", "article:cancel");
-
-  return keyboard;
-}
-
 function getCategoriesKeyboard(categories) {
   const keyboard = new InlineKeyboard();
 
